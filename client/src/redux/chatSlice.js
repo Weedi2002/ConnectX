@@ -23,6 +23,11 @@ export const createGroup = createAsyncThunk('chat/createGroup', async (payload) 
   return data.chat;
 });
 
+export const fetchNotifications = createAsyncThunk('chat/fetchNotifications', async () => {
+  const { data } = await api.get('/notifications');
+  return data.notifications;
+});
+
 const chatSlice = createSlice({
   name: 'chat',
   initialState: {

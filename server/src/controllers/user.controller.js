@@ -15,8 +15,19 @@ export const searchUsers = asyncHandler(async (req, res) => {
     String(r.sender) === String(req.user._id) ? r.recipient : r.sender,
   );
 
+  const pending = await FriendRequest.find({
+    status: 'pending',
+    $or: [{ sender: req.user._id }, { recipient: req.user._id }],
+  });
+  const pendingIds = pending.map((r) =>
+    String(r.sender) === String(req.user._id) ? r.recipient : r.sender,
+  );
+
   const filter = {
-    _id: { $ne: req.user._id, $nin: [...req.user.blocked, ...friendIds] },
+    _id: {
+      $ne: req.user._id,
+      $nin: [...req.user.blocked, ...friendIds, ...pendingIds],
+    },
     blocked: { $ne: req.user._id },
   };
   if (q) {

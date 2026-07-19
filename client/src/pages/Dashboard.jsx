@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchChats } from '../redux/chatSlice.js';
+import { fetchChats, fetchNotifications } from '../redux/chatSlice.js';
 import { fetchIncoming, fetchFriends } from '../redux/friendSlice.js';
 import { useSocketEvents } from '../hooks/useSocketEvents.js';
 import Sidebar from '../components/chat/Sidebar.jsx';
@@ -16,6 +16,7 @@ function Dashboard() {
     dispatch(fetchChats());
     dispatch(fetchIncoming());
     dispatch(fetchFriends());
+    dispatch(fetchNotifications());
   }, [dispatch]);
 
   return (

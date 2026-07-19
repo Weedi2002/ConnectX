@@ -9,8 +9,12 @@ import { formatTime, formatBytes } from '../../utils/format.js';
 import { cn } from '../../utils/cn.js';
 import Avatar from '../Avatar.jsx';
 import Markdown from './Markdown.jsx';
+import VoiceMessage from './VoiceMessage.jsx';
 
 function Attachment({ att }) {
+  if (att.type === 'audio') {
+    return <VoiceMessage url={att.url} name={att.name} size={att.size} own={false} />;
+  }
   if (att.type === 'image') {
     return (
       <a href={att.url} target="_blank" rel="noreferrer">
