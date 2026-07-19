@@ -8,7 +8,7 @@ import Avatar from '../Avatar.jsx';
 import { formatTime } from '../../utils/format.js';
 
 function title(n) {
-  const name = n.actor?.username || (n.payload?.username || 'Someone');
+  const name = n.actor?.username || n.payload?.username || 'Someone';
   switch (n.type) {
     case 'message':
       return `New message from ${name}`;

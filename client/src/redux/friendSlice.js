@@ -110,9 +110,7 @@ const friendSlice = createSlice({
           (r) => String(r.sender?._id) !== String(action.payload),
         );
         state.unread = state.incoming.length;
-        state.sent = state.sent.filter(
-          (r) => String(r.recipient?._id) !== String(action.payload),
-        );
+        state.sent = state.sent.filter((r) => String(r.recipient?._id) !== String(action.payload));
       })
       .addCase(unblockUser.fulfilled, (state, action) => {
         state.blocked = state.blocked.filter((u) => u._id !== action.payload);

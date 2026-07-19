@@ -104,7 +104,10 @@ export default function FriendRequestsPanel({ onClose }) {
               <p className="text-center text-sm text-slate-500">No incoming requests</p>
             ) : (
               incoming.map((r) => (
-                <div key={r._id} className="mb-2 flex items-center gap-3 rounded-lg bg-slate-800/60 p-2">
+                <div
+                  key={r._id}
+                  className="mb-2 flex items-center gap-3 rounded-lg bg-slate-800/60 p-2"
+                >
                   <Avatar user={r.sender} size={40} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm text-slate-100">{r.sender?.username}</p>
@@ -130,7 +133,10 @@ export default function FriendRequestsPanel({ onClose }) {
               <p className="text-center text-sm text-slate-500">No sent requests</p>
             ) : (
               sent.map((r) => (
-                <div key={r._id} className="mb-2 flex items-center gap-3 rounded-lg bg-slate-800/60 p-2">
+                <div
+                  key={r._id}
+                  className="mb-2 flex items-center gap-3 rounded-lg bg-slate-800/60 p-2"
+                >
                   <Avatar user={r.recipient} size={40} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm text-slate-100">{r.recipient?.username}</p>
@@ -151,7 +157,10 @@ export default function FriendRequestsPanel({ onClose }) {
               <p className="text-center text-sm text-slate-500">No blocked users</p>
             ) : (
               blocked.map((u) => (
-                <div key={u._id} className="mb-2 flex items-center gap-3 rounded-lg bg-slate-800/60 p-2">
+                <div
+                  key={u._id}
+                  className="mb-2 flex items-center gap-3 rounded-lg bg-slate-800/60 p-2"
+                >
                   <Avatar user={u} size={40} />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm text-slate-100">{u.username}</p>

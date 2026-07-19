@@ -24,7 +24,10 @@ export default function SearchModal({ onClose }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    searchApi.recent().then((r) => setRecent(r.data.recentSearches)).catch(() => {});
+    searchApi
+      .recent()
+      .then((r) => setRecent(r.data.recentSearches))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -63,8 +66,7 @@ export default function SearchModal({ onClose }) {
     onClose();
   };
 
-  const hasContent =
-    results.users.length || results.groups.length || results.messages.length;
+  const hasContent = results.users.length || results.groups.length || results.messages.length;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 p-4 pt-20">
@@ -158,9 +160,7 @@ export default function SearchModal({ onClose }) {
                 <Row key={g._id} onClick={() => openChat(g._id)}>
                   <Avatar user={{ username: g.name, avatar: g.avatar }} size={36} />
                   <span className="text-sm">{g.name}</span>
-                  <span className="ml-auto text-xs text-slate-500">
-                    {g.members.length} members
-                  </span>
+                  <span className="ml-auto text-xs text-slate-500">{g.members.length} members</span>
                 </Row>
               ))}
             </Section>
@@ -181,9 +181,7 @@ export default function SearchModal({ onClose }) {
                         : m.content}
                     </p>
                   </div>
-                  <span className="text-[10px] text-slate-500">
-                    {formatTime(m.createdAt)}
-                  </span>
+                  <span className="text-[10px] text-slate-500">{formatTime(m.createdAt)}</span>
                 </Row>
               ))}
             </Section>

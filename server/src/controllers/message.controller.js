@@ -137,9 +137,7 @@ export const reactMessage = asyncHandler(async (req, res) => {
       (r) => !(String(r.user) === String(req.user._id) && r.emoji === emoji),
     );
   } else {
-    message.reactions = message.reactions.filter(
-      (r) => String(r.user) !== String(req.user._id),
-    );
+    message.reactions = message.reactions.filter((r) => String(r.user) !== String(req.user._id));
     message.reactions.push({ user: req.user._id, emoji });
   }
   await message.save();
@@ -189,9 +187,7 @@ export const bookmarkMessage = asyncHandler(async (req, res) => {
 
   const has = message.bookmarkedBy.some((b) => String(b) === String(req.user._id));
   if (has) {
-    message.bookmarkedBy = message.bookmarkedBy.filter(
-      (b) => String(b) !== String(req.user._id),
-    );
+    message.bookmarkedBy = message.bookmarkedBy.filter((b) => String(b) !== String(req.user._id));
   } else {
     message.bookmarkedBy.push(req.user._id);
   }

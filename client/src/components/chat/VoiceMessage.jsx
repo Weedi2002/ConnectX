@@ -56,7 +56,9 @@ export default function VoiceMessage({ url, name, size, own }) {
       <div className="min-w-0 flex-1">
         <div ref={containerRef} className="w-40 max-w-full sm:w-56" />
         <div className="mt-0.5 flex items-center justify-between text-[10px] opacity-80">
-          <span>{formatDuration(current)} / {formatDuration(duration)}</span>
+          <span>
+            {formatDuration(current)} / {formatDuration(duration)}
+          </span>
           {ready && <span>{formatBytes(size)}</span>}
         </div>
       </div>

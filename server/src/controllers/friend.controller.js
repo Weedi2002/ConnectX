@@ -129,7 +129,8 @@ export const listFriends = asyncHandler(async (req, res) => {
   const requests = await FriendRequest.find({
     status: 'accepted',
     $or: [{ sender: req.user._id }, { recipient: req.user._id }],
-  }).populate('sender', 'username avatar presence lastSeen bio')
+  })
+    .populate('sender', 'username avatar presence lastSeen bio')
     .populate('recipient', 'username avatar presence lastSeen bio');
 
   const friends = requests.map((r) =>

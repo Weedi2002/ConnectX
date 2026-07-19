@@ -62,9 +62,7 @@ function NewChatSearch() {
         </ul>
       )}
 
-      {profileId && (
-        <UserProfileModal userId={profileId} onClose={() => setProfileId(null)} />
-      )}
+      {profileId && <UserProfileModal userId={profileId} onClose={() => setProfileId(null)} />}
     </div>
   );
 }

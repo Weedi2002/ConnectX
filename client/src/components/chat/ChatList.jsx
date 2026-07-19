@@ -105,7 +105,9 @@ function ChatList() {
                     </div>
                     <p className="flex items-center gap-1 truncate text-xs text-slate-400">
                       {muted && <span title="Muted">🔕</span>}
-                      {last?.attachments?.length ? '📎 Attachment' : last?.content || 'No messages yet'}
+                      {last?.attachments?.length
+                        ? '📎 Attachment'
+                        : last?.content || 'No messages yet'}
                     </p>
                   </div>
                 </button>

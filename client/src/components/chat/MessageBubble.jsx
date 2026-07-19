@@ -171,14 +171,10 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
         )}
       >
         {isGroup && !own && (
-          <p className="mb-0.5 text-xs font-semibold text-indigo-300">
-            {message.sender?.username}
-          </p>
+          <p className="mb-0.5 text-xs font-semibold text-indigo-300">{message.sender?.username}</p>
         )}
 
-        {message.forwardedFrom && (
-          <p className="mb-0.5 text-[10px] opacity-70">↪ Forwarded</p>
-        )}
+        {message.forwardedFrom && <p className="mb-0.5 text-[10px] opacity-70">↪ Forwarded</p>}
 
         <ReplyPreview replyTo={message.replyTo} own={own} />
 
@@ -221,20 +217,35 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
               own ? 'right-0' : 'left-0',
             )}
           >
-            <button onClick={handleReply} className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800">
+            <button
+              onClick={handleReply}
+              className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
+            >
               ↩ Reply
             </button>
-            <button onClick={() => setPicker((p) => !p)} className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800">
+            <button
+              onClick={() => setPicker((p) => !p)}
+              className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
+            >
               😊 React
             </button>
-            <button onClick={handlePin} className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800">
+            <button
+              onClick={handlePin}
+              className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
+            >
               📌 {message.pinned ? 'Unpin' : 'Pin'}
             </button>
-            <button onClick={handleBookmark} className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800">
+            <button
+              onClick={handleBookmark}
+              className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
+            >
               🔖 Bookmark
             </button>
             {own && (
-              <button onClick={handleEdit} className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800">
+              <button
+                onClick={handleEdit}
+                className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
+              >
                 ✏️ Edit
               </button>
             )}
@@ -248,11 +259,17 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
               ➡️ Forward
             </button>
             {own && (
-              <button onClick={handleDelete} className="block w-full rounded px-2 py-1 text-left text-red-400 hover:bg-slate-800">
+              <button
+                onClick={handleDelete}
+                className="block w-full rounded px-2 py-1 text-left text-red-400 hover:bg-slate-800"
+              >
                 🗑 Delete
               </button>
             )}
-            <button onClick={handleCopy} className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800">
+            <button
+              onClick={handleCopy}
+              className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
+            >
               📋 Copy
             </button>
           </div>

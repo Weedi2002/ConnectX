@@ -46,10 +46,7 @@ export const getChats = asyncHandler(async (req, res) => {
           {
             $match: {
               $expr: {
-                $and: [
-                  { $eq: ['$chat', '$$chatId'] },
-                  { $eq: ['$user', req.user._id] },
-                ],
+                $and: [{ $eq: ['$chat', '$$chatId'] }, { $eq: ['$user', req.user._id] }],
               },
             },
           },
@@ -59,17 +56,15 @@ export const getChats = asyncHandler(async (req, res) => {
     },
     {
       $addFields: {
-        settings: { $cond: [{ $gt: [{ $size: '$settings' }, 0] }, { $arrayElemAt: ['$settings', 0] }, null] },
+        settings: {
+          $cond: [{ $gt: [{ $size: '$settings' }, 0] }, { $arrayElemAt: ['$settings', 0] }, null],
+        },
       },
     },
     { $sort: { updatedAt: -1 } },
   ]);
 
-  const populated = await Chat.populate(chats, [
-    POPULATE_MEMBERS,
-    POPULATE_ADMINS,
-    POPULATE_LAST,
-  ]);
+  const populated = await Chat.populate(chats, [POPULATE_MEMBERS, POPULATE_ADMINS, POPULATE_LAST]);
   res.json({ chats: populated });
 });
 

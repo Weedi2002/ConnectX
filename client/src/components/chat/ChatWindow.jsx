@@ -157,7 +157,9 @@ function ChatWindow() {
               {pinned[0].content || '📎 attachment'}
             </span>
             {pinned.length > 1 && (
-              <span className="ml-auto whitespace-nowrap text-slate-500">+{pinned.length - 1} more</span>
+              <span className="ml-auto whitespace-nowrap text-slate-500">
+                +{pinned.length - 1} more
+              </span>
             )}
           </div>
         )}
