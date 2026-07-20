@@ -34,7 +34,10 @@ async function generate(m, prompt) {
     return await m.generateContent(prompt);
   } catch (err) {
     if (err?.message?.includes('429') || err?.status === 429) {
-      throw new ApiError(429, 'AI quota exceeded. Please try again later or check your Gemini plan.');
+      throw new ApiError(
+        429,
+        'AI quota exceeded. Please try again later or check your Gemini plan.',
+      );
     }
     if (err?.status === 403 || err?.message?.includes('API key')) {
       throw new ApiError(503, 'AI request rejected (check GEMINI_API_KEY).');

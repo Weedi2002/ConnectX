@@ -162,7 +162,10 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
     if (!message.content) return;
     setTranslating(true);
     try {
-      const { data } = await api.post('/ai/translate', { text: message.content, target: 'English' });
+      const { data } = await api.post('/ai/translate', {
+        text: message.content,
+        target: 'English',
+      });
       setTranslated(data.translated);
     } catch {
       toast.error('Translation failed');
@@ -304,7 +307,11 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
                 className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
                 title="Translate to English"
               >
-                {translating ? '⏳ Translating…' : translated !== null ? '↺ Show original' : '🌐 Translate'}
+                {translating
+                  ? '⏳ Translating…'
+                  : translated !== null
+                    ? '↺ Show original'
+                    : '🌐 Translate'}
               </button>
             )}
           </div>

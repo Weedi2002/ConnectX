@@ -218,14 +218,20 @@ function ChatWindow() {
       {forwardMsg && <ForwardModal message={forwardMsg} onClose={() => setForwardMsg(null)} />}
 
       {summary !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setSummary(null)}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={() => setSummary(null)}
+        >
           <div
             className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between">
               <p className="text-lg font-semibold text-slate-100">✨ Conversation summary</p>
-              <button onClick={() => setSummary(null)} className="text-slate-400 hover:text-red-400">
+              <button
+                onClick={() => setSummary(null)}
+                className="text-slate-400 hover:text-red-400"
+              >
                 ×
               </button>
             </div>

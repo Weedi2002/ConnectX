@@ -2,7 +2,11 @@ import { Chat } from '../models/Chat.js';
 import { Message } from '../models/Message.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
-import { smartReply as aiSmartReply, summarize as aiSummarize, translate as aiTranslate } from '../services/gemini.service.js';
+import {
+  smartReply as aiSmartReply,
+  summarize as aiSummarize,
+  translate as aiTranslate,
+} from '../services/gemini.service.js';
 
 const SENDER = 'username avatar';
 
