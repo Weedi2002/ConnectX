@@ -47,6 +47,12 @@ export const usersApi = {
   profile: (id) => api.get(`/users/${id}`),
 };
 
+export const aiApi = {
+  smartReply: (chatId) => api.post('/ai/smart-reply', { chatId }),
+  summarize: (chatId) => api.post('/ai/summarize', { chatId }),
+  translate: (text, target) => api.post('/ai/translate', { text, target }),
+};
+
 let onUnauthorized = null;
 
 export function setUnauthorizedHandler(fn) {

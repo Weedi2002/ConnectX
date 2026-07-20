@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { fetchMessages, setActiveChat, updateChatSettings } from '../../redux/chatSlice.js';
 import { getSocket } from '../../services/socket.js';
-import { api, chatSettingsApi } from '../../services/api.js';
+import { api, chatSettingsApi, aiApi } from '../../services/api.js';
 import Avatar from '../Avatar.jsx';
 import MessageList from './MessageList.jsx';
 import MessageInput from './MessageInput.jsx';
@@ -18,6 +18,9 @@ function ChatWindow() {
   const [showInfo, setShowInfo] = useState(false);
   const [forwardMsg, setForwardMsg] = useState(null);
   const [pinned, setPinned] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [summary, setSummary] = useState(null);
 
   const chat = chats.find((c) => c._id === activeChatId);
   const isGroup = chat?.isGroup;
@@ -57,6 +60,33 @@ function ChatWindow() {
   }, [activeChatId]);
 
   const handleForward = (msg) => setForwardMsg(msg);
+
+  const handleSmartReply = async () => {
+    if (!activeChatId || aiBusy) return;
+    setAiBusy(true);
+    try {
+      const { data } = await aiApi.smartReply(activeChatId);
+      setSuggestions(data.suggestions || []);
+      if (!data.suggestions?.length) toast('No suggestions right now');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'AI unavailable');
+    } finally {
+      setAiBusy(false);
+    }
+  };
+
+  const handleSummarize = async () => {
+    if (!activeChatId || aiBusy) return;
+    setAiBusy(true);
+    try {
+      const { data } = await aiApi.summarize(activeChatId);
+      setSummary(data.summary || 'No summary available.');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'AI unavailable');
+    } finally {
+      setAiBusy(false);
+    }
+  };
 
   const toggleSetting = async (key) => {
     try {
@@ -144,10 +174,24 @@ function ChatWindow() {
           >
             {settings.favorite ? '⭐' : '☆'}
           </button>
+          <button
+            onClick={handleSmartReply}
+            disabled={aiBusy}
+            className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 disabled:opacity-50"
+            title="AI smart replies"
+          >
+            {aiBusy ? '⏳' : '✨'}
+          </button>
         </header>
 
         <MessageList chatId={activeChatId} isGroup={isGroup} onForward={handleForward} />
-        <MessageInput chatId={activeChatId} />
+        <MessageInput
+          chatId={activeChatId}
+          suggestions={suggestions}
+          onUseSuggestion={() => setSuggestions([])}
+          onSummarize={handleSummarize}
+          aiBusy={aiBusy}
+        />
 
         {pinned.length > 0 && (
           <div className="flex items-center gap-2 border-t border-slate-800 bg-slate-900/80 px-4 py-1.5 text-xs text-slate-300">
@@ -172,6 +216,23 @@ function ChatWindow() {
       )}
 
       {forwardMsg && <ForwardModal message={forwardMsg} onClose={() => setForwardMsg(null)} />}
+
+      {summary !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setSummary(null)}>
+          <div
+            className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-lg font-semibold text-slate-100">✨ Conversation summary</p>
+              <button onClick={() => setSummary(null)} className="text-slate-400 hover:text-red-400">
+                ×
+              </button>
+            </div>
+            <div className="whitespace-pre-wrap text-sm text-slate-200">{summary}</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

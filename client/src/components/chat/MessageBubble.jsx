@@ -93,6 +93,8 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
   const dispatch = useDispatch();
   const [menu, setMenu] = useState(false);
   const [picker, setPicker] = useState(false);
+  const [translated, setTranslated] = useState(null);
+  const [translating, setTranslating] = useState(false);
 
   const handleDelete = async () => {
     try {
@@ -151,6 +153,24 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
     toast.success('Copied');
   };
 
+  const handleTranslate = async () => {
+    setMenu(false);
+    if (translated !== null) {
+      setTranslated(null);
+      return;
+    }
+    if (!message.content) return;
+    setTranslating(true);
+    try {
+      const { data } = await api.post('/ai/translate', { text: message.content, target: 'English' });
+      setTranslated(data.translated);
+    } catch {
+      toast.error('Translation failed');
+    } finally {
+      setTranslating(false);
+    }
+  };
+
   const handleReply = () => {
     dispatch(setReplyTo({ chatId, message }));
     setMenu(false);
@@ -186,6 +206,12 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
           </div>
         )}
         {message.content && <Markdown>{message.content}</Markdown>}
+        {translated !== null && (
+          <div className="mt-1 rounded-lg border border-indigo-500/30 bg-indigo-500/5 p-2 text-xs text-slate-300">
+            <span className="mr-1 opacity-70">🌐</span>
+            {translated}
+          </div>
+        )}
 
         {message.edited && <span className="ml-1 text-[10px] opacity-60">(edited)</span>}
 
@@ -272,6 +298,15 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
             >
               📋 Copy
             </button>
+            {message.content && (
+              <button
+                onClick={handleTranslate}
+                className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
+                title="Translate to English"
+              >
+                {translating ? '⏳ Translating…' : translated !== null ? '↺ Show original' : '🌐 Translate'}
+              </button>
+            )}
           </div>
         )}
 

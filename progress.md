@@ -112,16 +112,21 @@
 - [x] **Friends list** (`GET /friends/friends`): accepted friends shown only here, excluded from user search + pending-request users excluded too
 - [x] FriendRequestsPanel adds a "Friends" tab (click to open chat)
 
-### Voice Messages
-- [ ] Hold to record
-- [ ] Waveform
-- [ ] Download
+### Voice Messages ✅
+- [x] Hold-to-record mic (native MediaRecorder) in MessageInput
+- [x] Waveform player (wavesurfer.js) with play/pause, progress, duration, download (`VoiceMessage.jsx`)
+- [x] Uploads to Cloudinary; server upload allowlist extended with audio/wav, mp3, m4a, mp4, aac, flac
+- [x] `MessageBubble` renders `type: 'audio'` attachments via `VoiceMessage`; client sets `type:'audio'`
+- [x] Notifications auto-load on Dashboard mount (`fetchNotifications` thunk) + real-time via socket
+- [x] Search excludes pending friend-request users; notifications panel positioning fixed (left-0)
 
-### AI Assistant (Gemini 2.0 Flash)
-- [ ] Gemini API integration (@google/generative-ai)
-- [ ] Smart replies
-- [ ] Conversation summarization
-- [ ] Message translation
+### AI Assistant (Gemini) ✅
+- [x] Gemini API integration (`@google/generative-ai`) — `gemini.service.js`, `GEMINI_API_KEY` + `GEMINI_MODEL` env (default `gemini-2.5-flash`; configurable)
+- [x] Note: `gemini-1.5-flash` is NOT available for the project key (404 on Google), so default switched to `gemini-2.5-flash` (free-tier, verified working)
+- [x] Smart replies (`POST /api/ai/smart-reply`) — suggests 3 replies; rendered as chips in `MessageInput`
+- [x] Conversation summarization (`POST /api/ai/summarize`) — summary modal in `ChatWindow`
+- [x] Message translation (`POST /api/ai/translate`) — per-message "Translate" in `MessageBubble`, inline translated text toggle
+- [x] Graceful errors: 503 (no key), 429 (quota), friendly 502 on other failures; auth + chat-membership guards on all AI routes
 
 ### Jobs & Queue
 - [ ] BullMQ setup

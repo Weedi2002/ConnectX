@@ -8,7 +8,7 @@ import { getSocket } from '../../services/socket.js';
 import { formatBytes } from '../../utils/format.js';
 import { formatDuration } from '../../utils/format.js';
 
-function MessageInput({ chatId }) {
+function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, aiBusy }) {
   const dispatch = useDispatch();
   const replyTo = useSelector((s) => s.chat.replyToByChat[chatId]);
   const [text, setText] = useState('');
@@ -224,6 +224,24 @@ function MessageInput({ chatId }) {
         </div>
       )}
 
+      {suggestions.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-2">
+          {suggestions.map((s, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => {
+                setText((t) => (t ? `${t} ${s}` : s));
+                onUseSuggestion?.(s);
+              }}
+              className="rounded-full border border-indigo-500/50 bg-indigo-500/10 px-3 py-1 text-xs text-indigo-200 hover:bg-indigo-500/20"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+
       <form onSubmit={handleSend} className="flex items-center gap-2">
         <button
           type="button"
@@ -232,6 +250,15 @@ function MessageInput({ chatId }) {
           title="Attach files"
         >
           📎
+        </button>
+        <button
+          type="button"
+          onClick={onSummarize}
+          disabled={aiBusy}
+          className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 disabled:opacity-50"
+          title="AI summarize conversation"
+        >
+          ✨
         </button>
         <input
           ref={fileInput}

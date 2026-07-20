@@ -12,6 +12,7 @@
     "test": "node --test"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@sentry/node": "^8.47.0",
     "@socket.io/redis-adapter": "^8.3.0",
     "bcryptjs": "^2.4.3",
