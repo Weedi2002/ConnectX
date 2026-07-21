@@ -8,6 +8,7 @@ import { User } from '../models/User.js';
 import { Chat } from '../models/Chat.js';
 import { registerPresence } from './presence.js';
 import { registerChatHandlers } from './chat.handlers.js';
+import { setIO } from './realtime.js';
 
 export async function initSocket(httpServer) {
   const io = new Server(httpServer, {
@@ -52,6 +53,8 @@ export async function initSocket(httpServer) {
     registerPresence(io, socket);
     registerChatHandlers(io, socket);
   });
+
+  setIO(io);
 
   return io;
 }

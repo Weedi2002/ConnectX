@@ -1,6 +1,6 @@
 # ConnectX – Progress Tracker
 
-**Last updated:** Phase 2 - Friend Requests complete
+**Last updated:** Phase 2 - Jobs & Queue (BullMQ) complete
 
 **Status legend:** `[ ]` pending · `[~]` in progress · `[x]` done
 
@@ -128,11 +128,13 @@
 - [x] Message translation (`POST /api/ai/translate`) — per-message "Translate" in `MessageBubble`, inline translated text toggle
 - [x] Graceful errors: 503 (no key), 429 (quota), friendly 502 on other failures; auth + chat-membership guards on all AI routes
 
-### Jobs & Queue
-- [ ] BullMQ setup
-- [ ] Email jobs
-- [ ] Notification jobs
-- [ ] Media processing jobs
+### Jobs & Queue (BullMQ) ✅
+- [x] `bullmq` dependency added; dedicated Redis connection (`queues/connection.js`, `maxRetriesPerRequest: null`)
+- [x] Queue bootstrap (`queues/index.js`) — `initQueues`/`closeQueues`, wired into `server.js` (start + graceful shutdown)
+- [x] **Email jobs** (`queues/email.queue.js`): `verification` + `reset-password` enqueued from `auth.controller`; worker sends via `email.service` (retry/backoff)
+- [x] **Notification jobs** (`queues/notification.queue.js`): `notify()` enqueues; worker persists (`Notification.insertMany`) + emits `notification:new` via shared IO accessor (`sockets/realtime.js`)
+- [x] **Media jobs** (`queues/media.queue.js`): image attachments enqueued after send; worker generates `sharp` thumbnail → Cloudinary `connectx/thumbnails` → patches message attachment `thumbnail`
+- [x] `attachmentSchema.thumbnail` field added to `Message` model
 
 ---
 

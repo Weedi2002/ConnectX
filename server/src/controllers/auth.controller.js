@@ -10,7 +10,7 @@ import {
   revokeSession,
   refreshCookieOptions,
 } from '../services/token.service.js';
-import { sendVerificationEmail, sendResetPasswordEmail } from '../services/email.service.js';
+import { addEmailJob } from '../queues/email.queue.js';
 
 const MAX_ATTEMPTS = 5;
 const LOCK_MINUTES = 15;
@@ -49,7 +49,7 @@ export const register = asyncHandler(async (req, res) => {
     emailVerifyExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
   });
 
-  await sendVerificationEmail(email, verifyToken).catch(() => {});
+  await addEmailJob('verification', { email, token: verifyToken });
 
   const accessToken = await issueTokens(res, user, req);
   res.status(201).json({ user: user.toSafeJSON(), accessToken });
@@ -134,7 +134,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     user.resetPasswordToken = hashRaw(token);
     user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
     await user.save();
-    await sendResetPasswordEmail(email, token).catch(() => {});
+    await addEmailJob('reset-password', { email, token });
   }
   res.json({ message: 'If that email exists, a reset link has been sent.' });
 });

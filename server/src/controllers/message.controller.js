@@ -3,6 +3,7 @@ import { Message } from '../models/Message.js';
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { notify } from '../services/notification.service.js';
+import { addMediaJob } from '../queues/media.queue.js';
 
 const SENDER = 'username avatar';
 const REPLY_POPULATE = {
@@ -82,6 +83,11 @@ export const sendMessage = asyncHandler(async (req, res) => {
     actor: req.user._id,
     payload: { messageId: message._id, content: message.content, sender: message.sender?.username },
   });
+
+  (message.attachments || [])
+    .filter((a) => a.type === 'image')
+    .forEach((a) => addMediaJob(a, message._id).catch(() => {}));
+
   res.status(201).json({ message });
 });
 

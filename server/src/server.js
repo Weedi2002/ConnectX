@@ -6,12 +6,14 @@ import { connectDB, disconnectDB } from './config/db.js';
 import { connectRedis, disconnectRedis } from './config/redis.js';
 import { createApp } from './app.js';
 import { initSocket } from './sockets/index.js';
+import { initQueues, closeQueues } from './queues/index.js';
 
 async function start() {
   initSentry();
 
   await connectDB();
   await connectRedis();
+  await initQueues();
 
   const app = createApp();
   const httpServer = http.createServer(app);
@@ -25,6 +27,7 @@ async function start() {
   const shutdown = async (signal) => {
     logger.info(`${signal} received, shutting down gracefully`);
     httpServer.close();
+    await closeQueues().catch(() => {});
     await disconnectRedis().catch(() => {});
     await disconnectDB().catch(() => {});
     process.exit(0);
