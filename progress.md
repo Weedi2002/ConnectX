@@ -149,14 +149,15 @@
 ---
 
 ## Security Checklist
-- [ ] Helmet
-- [ ] CORS
-- [ ] Rate limiting (HTTP)
-- [ ] Rate limiting (per-socket)
-- [ ] Input validation
-- [ ] MongoDB injection protection
-- [ ] XSS protection
-- [ ] Password hashing (bcrypt/argon2)
+- [x] Helmet (`app.js:helmet()`)
+- [x] CORS (`app.js` + `sockets/index.js`, explicit origin, credentials)
+- [x] Rate limiting (HTTP) — global 300/15min + auth 20/15min (`middleware/rateLimit.js`)
+- [x] Rate limiting (per-socket) — `SocketRateLimiter` class (15 events/10s per user per event)
+- [x] Input validation — Zod on all POST/PUT routes; `escapeRegex` on search queries
+- [x] MongoDB injection protection — `express-mongo-sanitize` strips `$` keys; regex escape prevents ReDoS
+- [x] XSS protection — Helmet headers + `xss` package sanitizes username/bio/status/message content/chat name/description (pre-save hooks)
+- [x] Password hashing (bcryptjs, 12 rounds)
+- [x] Socket.IO event authorization — membership checks on chat:join/typing/message:delivered/read
 
 ---
 

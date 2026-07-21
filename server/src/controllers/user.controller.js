@@ -2,10 +2,11 @@ import { User } from '../models/User.js';
 import { FriendRequest } from '../models/FriendRequest.js';
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { escapeRegex } from '../utils/security.js';
 import { uploadBuffer, deleteAsset } from '../services/cloudinary.service.js';
 
 export const searchUsers = asyncHandler(async (req, res) => {
-  const q = (req.query.q || '').trim();
+  const q = escapeRegex((req.query.q || '').trim());
 
   const accepted = await FriendRequest.find({
     status: 'accepted',

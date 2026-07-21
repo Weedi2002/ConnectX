@@ -52,6 +52,10 @@ export async function initSocket(httpServer) {
 
     registerPresence(io, socket);
     registerChatHandlers(io, socket);
+
+    socket.on('disconnect', () => {
+      logger.info({ userId: socket.userId }, 'Socket disconnected');
+    });
   });
 
   setIO(io);

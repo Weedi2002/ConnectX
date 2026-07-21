@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { sanitize } from '../utils/security.js';
 
 const userSchema = new mongoose.Schema(
   {
@@ -67,6 +68,9 @@ userSchema.virtual('isLocked').get(function () {
 });
 
 userSchema.pre('save', async function (next) {
+  if (this.isModified('username')) this.username = sanitize(this.username);
+  if (this.isModified('bio')) this.bio = sanitize(this.bio);
+  if (this.isModified('status')) this.status = sanitize(this.status);
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();

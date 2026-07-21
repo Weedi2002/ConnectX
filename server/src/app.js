@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize';
 import cookieParser from 'cookie-parser';
 import pinoHttp from 'pino-http';
 import { env } from './config/env.js';
@@ -21,6 +22,7 @@ export function createApp() {
     }),
   );
   app.use(express.json({ limit: '2mb' }));
+  app.use(mongoSanitize({ replaceWith: '_' }));
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(pinoHttp({ logger, autoLogging: env.NODE_ENV !== 'test' }));

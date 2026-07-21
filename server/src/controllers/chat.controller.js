@@ -5,8 +5,9 @@ import { FriendRequest } from '../models/FriendRequest.js';
 import { Message } from '../models/Message.js';
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { uploadBuffer, deleteAsset } from '../services/cloudinary.service.js';
+import { escapeRegex } from '../utils/security.js';
 import { notify } from '../services/notification.service.js';
+import { uploadBuffer, deleteAsset } from '../services/cloudinary.service.js';
 
 const POPULATE_MEMBERS = { path: 'members', select: 'username avatar presence lastSeen bio' };
 const POPULATE_ADMINS = { path: 'admins', select: 'username avatar' };
@@ -321,7 +322,7 @@ export const demoteAdmin = asyncHandler(async (req, res) => {
 });
 
 export const search = asyncHandler(async (req, res) => {
-  const q = (req.query.q || '').toString().trim();
+  const q = escapeRegex((req.query.q || '').toString().trim());
   if (!q) return res.json({ users: [], groups: [], messages: [] });
 
   const limit = Math.min(Number(req.query.limit) || 10, 25);

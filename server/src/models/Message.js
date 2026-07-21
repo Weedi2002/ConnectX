@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { sanitize } from '../utils/security.js';
 
 const attachmentSchema = new mongoose.Schema(
   {
@@ -49,5 +50,10 @@ const messageSchema = new mongoose.Schema(
 
 messageSchema.index({ chat: 1, createdAt: -1 });
 messageSchema.index({ content: 'text' });
+
+messageSchema.pre('save', function (next) {
+  if (this.isModified('content')) this.content = sanitize(this.content);
+  next();
+});
 
 export const Message = mongoose.model('Message', messageSchema);
