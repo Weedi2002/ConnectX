@@ -27,6 +27,4 @@ export const emailWorker = new Worker(
   { connection: getQueueConnection().duplicate(), concurrency: 4 },
 );
 
-emailWorker.on('failed', (job, err) =>
-  logger.error({ jobId: job?.id, err }, 'email job failed'),
-);
+emailWorker.on('failed', (job, err) => logger.error({ jobId: job?.id, err }, 'email job failed'));

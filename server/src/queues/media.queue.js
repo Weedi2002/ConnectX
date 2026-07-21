@@ -8,12 +8,16 @@ import { uploadBuffer } from '../services/cloudinary.service.js';
 export const mediaQueue = new Queue('media', { connection: getQueueConnection() });
 
 export function addMediaJob(attachment, messageId) {
-  return mediaQueue.add('process', { attachment, messageId }, {
-    attempts: 2,
-    backoff: { type: 'exponential', delay: 4000 },
-    removeOnComplete: 100,
-    removeOnFail: 100,
-  });
+  return mediaQueue.add(
+    'process',
+    { attachment, messageId },
+    {
+      attempts: 2,
+      backoff: { type: 'exponential', delay: 4000 },
+      removeOnComplete: 100,
+      removeOnFail: 100,
+    },
+  );
 }
 
 export const mediaWorker = new Worker(
@@ -44,6 +48,4 @@ export const mediaWorker = new Worker(
   { connection: getQueueConnection().duplicate(), concurrency: 2 },
 );
 
-mediaWorker.on('failed', (job, err) =>
-  logger.error({ jobId: job?.id, err }, 'media job failed'),
-);
+mediaWorker.on('failed', (job, err) => logger.error({ jobId: job?.id, err }, 'media job failed'));
