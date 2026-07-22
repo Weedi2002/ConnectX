@@ -14,11 +14,9 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
   const [files, setFiles] = useState([]);
   const [sending, setSending] = useState(false);
   const [picker, setPicker] = useState(false);
-
   const typingRef = useRef(false);
   const typingTimeout = useRef(null);
   const fileInput = useRef(null);
-
   const [recording, setRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const mediaRecorderRef = useRef(null);
@@ -29,15 +27,9 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
 
   const emitTyping = () => {
     const socket = getSocket();
-    if (!typingRef.current) {
-      typingRef.current = true;
-      socket?.emit('typing:start', { chatId });
-    }
+    if (!typingRef.current) { typingRef.current = true; socket?.emit('typing:start', { chatId }); }
     clearTimeout(typingTimeout.current);
-    typingTimeout.current = setTimeout(() => {
-      typingRef.current = false;
-      socket?.emit('typing:stop', { chatId });
-    }, 1500);
+    typingTimeout.current = setTimeout(() => { typingRef.current = false; socket?.emit('typing:stop', { chatId }); }, 1500);
   };
 
   const handleSend = async (e) => {
@@ -46,28 +38,15 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
     setSending(true);
     try {
       let attachments = [];
-      if (files.length > 0) {
-        const form = new FormData();
-        files.forEach((f) => form.append('files', f));
-        const { data } = await api.post('/upload', form, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        attachments = data.attachments;
-      }
-      const { data } = await api.post('/messages', {
-        chatId, content: text.trim(), attachments, replyTo: replyTo?._id,
-      });
+      if (files.length > 0) { const form = new FormData(); files.forEach((f) => form.append('files', f)); const { data } = await api.post('/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } }); attachments = data.attachments; }
+      const { data } = await api.post('/messages', { chatId, content: text.trim(), attachments, replyTo: replyTo?._id });
       dispatch(addMessage(data.message));
-      setText('');
-      setFiles([]);
+      setText(''); setFiles([]);
       dispatch(setReplyTo({ chatId, message: null }));
       getSocket()?.emit('typing:stop', { chatId });
       typingRef.current = false;
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to send');
-    } finally {
-      setSending(false);
-    }
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to send'); }
+    finally { setSending(false); }
   };
 
   const startRecording = async () => {
@@ -87,17 +66,12 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
         if (cancelledRef.current) { setRecording(false); setRecordingTime(0); return; }
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
         await uploadVoice(blob);
-        setRecording(false);
-        setRecordingTime(0);
+        setRecording(false); setRecordingTime(0);
       };
       recorder.start();
-      setRecording(true);
-      setRecordingTime(0);
+      setRecording(true); setRecordingTime(0);
       timerRef.current = setInterval(() => setRecordingTime((t) => t + 1), 1000);
-    } catch {
-      toast.error('Microphone access denied');
-      setRecording(false);
-    }
+    } catch { toast.error('Microphone access denied'); setRecording(false); }
   };
 
   const stopRecording = () => { mediaRecorderRef.current?.stop(); };
@@ -109,40 +83,28 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
     try {
       const ext = blob.type.includes('mp4') ? 'm4a' : 'webm';
       const file = new File([blob], `voice-${Date.now()}.${ext}`, { type: blob.type });
-      const form = new FormData();
-      form.append('files', file);
-      const { data } = await api.post('/upload', form, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const form = new FormData(); form.append('files', file);
+      const { data } = await api.post('/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } });
       const att = data.attachments[0];
       const attachment = { url: att.url, publicId: att.publicId, type: 'audio', name: att.name, size: att.size, mime: att.mime };
       const { data: msg } = await api.post('/messages', { chatId, content: '', attachments: [attachment] });
       dispatch(addMessage(msg.message));
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed to send voice message');
-    } finally {
-      setSending(false);
-    }
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed to send voice message'); }
+    finally { setSending(false); }
   };
 
   return (
-    <div className="glass border-t border-white/[0.06] px-4 py-3">
-      {/* Reply preview */}
+    <div className="glass border-t border-white/[0.08] px-4 py-3">
       {replyTo && (
-        <div className="glass-card mb-2 flex items-center gap-2 !rounded-xl border-l-2 border-indigo-400 px-3 py-2">
+        <div className="glass-card mb-2 flex items-center gap-2 !rounded-xl border-l-2 border-cyan-400 px-3 py-2">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-indigo-300">{replyTo.sender?.username || 'User'}</p>
-            <p className="truncate text-xs text-slate-300">
-              {replyTo.attachments?.length > 0 && !replyTo.content
-                ? `📎 ${replyTo.attachments[0].name}`
-                : replyTo.content}
-            </p>
+            <p className="text-xs font-semibold text-cyan-300">{replyTo.sender?.username || 'User'}</p>
+            <p className="truncate text-xs text-slate-300">{replyTo.attachments?.length > 0 && !replyTo.content ? `📎 ${replyTo.attachments[0].name}` : replyTo.content}</p>
           </div>
           <button onClick={() => dispatch(setReplyTo({ chatId, message: null }))} className="text-slate-400 hover:text-red-400">×</button>
         </div>
       )}
 
-      {/* File chips */}
       {files.length > 0 && (
         <div className="mb-2 flex flex-wrap gap-1.5">
           {files.map((f, i) => (
@@ -154,7 +116,6 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
         </div>
       )}
 
-      {/* Recording indicator */}
       {recording && (
         <div className="glass-card mb-2 flex items-center gap-2 !rounded-xl px-4 py-2.5 text-sm">
           <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" />
@@ -166,67 +127,29 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
         </div>
       )}
 
-      {/* AI suggestions */}
       {suggestions.length > 0 && (
         <div className="mb-2 flex flex-wrap gap-1.5">
           {suggestions.map((s, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => { setText((t) => (t ? `${t} ${s}` : s)); onUseSuggestion?.(s); }}
-              className="glass-card !rounded-full border-indigo-500/20 px-3 py-1 text-xs text-indigo-200 hover:bg-indigo-500/10"
-            >
-              {s}
-            </button>
+            <button key={i} type="button" onClick={() => { setText((t) => (t ? `${t} ${s}` : s)); onUseSuggestion?.(s); }} className="glass-card !rounded-full border-cyan-500/20 px-3 py-1 text-xs text-cyan-200 hover:bg-cyan-500/10">{s}</button>
           ))}
         </div>
       )}
 
-      {/* Input bar */}
       <form onSubmit={handleSend} className="flex items-center gap-2">
-        <button type="button" onClick={() => fileInput.current?.click()} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200 transition-colors" title="Attach files">
-          📎
-        </button>
+        <button type="button" onClick={() => fileInput.current?.click()} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors" title="Attach files">📎</button>
         <input ref={fileInput} type="file" multiple hidden onChange={(e) => setFiles((prev) => [...prev, ...Array.from(e.target.files)].slice(0, 5))} />
-
-        <button type="button" onClick={() => setPicker((p) => !p)} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200 transition-colors" title="Emoji">
-          😊
-        </button>
-
-        <input
-          value={text}
-          onChange={(e) => { setText(e.target.value); emitTyping(); }}
-          placeholder="Type your message here..."
-          className="glass-input flex-1 px-4 py-2.5 text-sm"
-        />
-
-        <button type="button" onClick={onSummarize} disabled={aiBusy} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200 transition-colors disabled:opacity-50" title="AI summarize">
-          ✨
-        </button>
-
+        <button type="button" onClick={() => setPicker((p) => !p)} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors" title="Emoji">😊</button>
+        <input value={text} onChange={(e) => { setText(e.target.value); emitTyping(); }} placeholder="Type your message here..." className="glass-input flex-1 px-4 py-2.5 text-sm" />
+        <button type="button" onClick={onSummarize} disabled={aiBusy} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors disabled:opacity-50" title="AI summarize">✨</button>
         {recording ? (
           <span className="glass-card flex-shrink-0 !rounded-full bg-red-500/20 px-4 py-2.5 text-sm text-red-300">● Rec</span>
         ) : (
-          <button type="button" onPointerDown={startRecording} disabled={sending} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200 transition-colors disabled:opacity-50" title="Hold to record voice message">
-            🎤
-          </button>
+          <button type="button" onPointerDown={startRecording} disabled={sending} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors disabled:opacity-50" title="Hold to record voice message">🎤</button>
         )}
-
-        <button type="submit" disabled={sending || (!text.trim() && files.length === 0)} className="glass-btn-primary flex-shrink-0 px-5 py-2.5 text-sm">
-          {sending ? '...' : '➤'}
-        </button>
+        <button type="submit" disabled={sending || (!text.trim() && files.length === 0)} className="glass-btn-primary flex-shrink-0 px-5 py-2.5 text-sm">➤</button>
       </form>
 
-      {picker && (
-        <div className="absolute bottom-20 left-3 z-30">
-          <EmojiPicker
-            onEmojiClick={(e) => { setText((t) => t + e.emoji); setPicker(false); }}
-            width={280}
-            height={320}
-            previewConfig={{ showPreview: false }}
-          />
-        </div>
-      )}
+      {picker && <div className="absolute bottom-20 left-3 z-30"><EmojiPicker onEmojiClick={(e) => { setText((t) => t + e.emoji); setPicker(false); }} width={280} height={320} previewConfig={{ showPreview: false }} /></div>}
     </div>
   );
 }
