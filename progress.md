@@ -1,6 +1,6 @@
 # ConnectX – Progress Tracker
 
-**Last updated:** Phase 2 - Jobs & Queue (BullMQ) complete
+**Last updated:** Phase 2 - Testing (Backend) complete
 
 **Status legend:** `[ ]` pending · `[~]` in progress · `[x]` done
 
@@ -160,10 +160,9 @@
 - [x] Socket.IO event authorization — membership checks on chat:join/typing/message:delivered/read
 
 ---
-
 ## Testing
-- [ ] Backend unit tests (Jest)
-- [ ] Backend integration tests (Supertest)
+- [x] Backend unit tests (Jest) — 44 tests, 7 suites, all passing
+- [x] Backend integration tests (Supertest) — auth, chat, message, friend endpoints
 - [ ] Frontend tests (Vitest + RTL)
 - [ ] E2E smoke tests
 
