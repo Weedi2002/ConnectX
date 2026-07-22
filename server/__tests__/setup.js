@@ -1,10 +1,14 @@
 import mongoose from 'mongoose';
-
-const MONGO_URI = 'mongodb://localhost:27017/connectx_test';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
 export async function connectTestDB() {
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(MONGO_URI);
+    const mongod = await MongoMemoryServer.create({
+      binary: { version: '7.0.0' },
+      instance: { port: 27018 },
+    });
+    const uri = mongod.getUri();
+    await mongoose.connect(uri, { serverSelectionTimeoutMS: 10000 });
   }
 }
 
