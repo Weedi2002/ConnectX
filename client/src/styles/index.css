@@ -6,7 +6,9 @@
   color-scheme: dark;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
 }
@@ -117,7 +119,8 @@ html, body, #root {
 .chat-bg {
   position: relative;
   background:
-    linear-gradient(145deg,
+    linear-gradient(
+      145deg,
       rgba(10, 30, 40, 0.55) 0%,
       rgba(15, 40, 55, 0.5) 40%,
       rgba(20, 50, 60, 0.45) 100%
@@ -131,7 +134,9 @@ html, body, #root {
 .app-shell {
   border-radius: 1.25rem;
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 25px 60px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 25px 60px rgba(0, 0, 0, 0.5);
 }
 
 /* ─── Nav rail panel ─── */
@@ -168,10 +173,19 @@ html, body, #root {
 }
 
 /* ─── Scrollbar ─── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.18); }
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
 
 /* ─── Nav active ─── */
 .nav-active {

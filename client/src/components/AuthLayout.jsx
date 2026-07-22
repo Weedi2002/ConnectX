@@ -20,10 +20,8 @@ function AuthLayout({ title, subtitle, children }) {
   );
 }
 
-export const inputClass =
-  'glass-input w-full px-4 py-2.5 text-sm';
+export const inputClass = 'glass-input w-full px-4 py-2.5 text-sm';
 
-export const buttonClass =
-  'glass-btn-primary w-full py-2.5 text-sm';
+export const buttonClass = 'glass-btn-primary w-full py-2.5 text-sm';
 
 export default AuthLayout;

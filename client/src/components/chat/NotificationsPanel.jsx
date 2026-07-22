@@ -9,12 +9,18 @@ import { formatTime } from '../../utils/format.js';
 function title(n) {
   const name = n.actor?.username || n.payload?.username || 'Someone';
   switch (n.type) {
-    case 'message': return `New message from ${name}`;
-    case 'added_to_group': return `Added to ${n.payload?.chatName || 'a group'}`;
-    case 'group_updated': return `${n.payload?.chatName || 'A group'} was updated`;
-    case 'member_left': return `${name} left ${n.payload?.chatName || 'a group'}`;
-    case 'message_pinned': return `${name} pinned a message`;
-    default: return 'New notification';
+    case 'message':
+      return `New message from ${name}`;
+    case 'added_to_group':
+      return `Added to ${n.payload?.chatName || 'a group'}`;
+    case 'group_updated':
+      return `${n.payload?.chatName || 'A group'} was updated`;
+    case 'member_left':
+      return `${name} left ${n.payload?.chatName || 'a group'}`;
+    case 'message_pinned':
+      return `${name} pinned a message`;
+    default:
+      return 'New notification';
   }
 }
 
@@ -40,14 +46,18 @@ export default function NotificationsPanel() {
       await notificationsApi.markAllRead();
       const { data } = await notificationsApi.list();
       dispatch(setNotifications(data.notifications.map((n) => ({ ...n, read: true }))));
-    } catch { toast.error('Failed'); }
+    } catch {
+      toast.error('Failed');
+    }
   };
 
   const clearAll = async () => {
     try {
       await notificationsApi.clear();
       dispatch(setNotifications([]));
-    } catch { toast.error('Failed'); }
+    } catch {
+      toast.error('Failed');
+    }
   };
 
   return (
@@ -55,8 +65,15 @@ export default function NotificationsPanel() {
       <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-white/[0.06]">
         <h3 className="font-semibold text-sm text-slate-100">Notifications</h3>
         <div className="flex gap-3 text-xs">
-          <button onClick={markAll} className="text-cyan-400 hover:text-cyan-300 transition-colors">Mark all read</button>
-          <button onClick={clearAll} className="text-slate-500 hover:text-slate-400 transition-colors">Clear</button>
+          <button onClick={markAll} className="text-cyan-400 hover:text-cyan-300 transition-colors">
+            Mark all read
+          </button>
+          <button
+            onClick={clearAll}
+            className="text-slate-500 hover:text-slate-400 transition-colors"
+          >
+            Clear
+          </button>
         </div>
       </div>
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1">

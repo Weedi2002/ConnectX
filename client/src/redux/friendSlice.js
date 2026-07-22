@@ -110,9 +110,7 @@ const friendSlice = createSlice({
         const blockedUser =
           state.incoming.find((r) => String(r.sender?._id) === userId)?.sender ||
           state.sent.find((r) => String(r.recipient?._id) === userId)?.recipient;
-        state.incoming = state.incoming.filter(
-          (r) => String(r.sender?._id) !== userId,
-        );
+        state.incoming = state.incoming.filter((r) => String(r.sender?._id) !== userId);
         state.unread = state.incoming.length;
         state.sent = state.sent.filter((r) => String(r.recipient?._id) !== userId);
         if (blockedUser && !state.blocked.some((u) => String(u._id) === userId)) {

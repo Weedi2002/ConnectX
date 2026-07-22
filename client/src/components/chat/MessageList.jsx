@@ -46,11 +46,7 @@ function MessageList({ chatId, isGroup, onForward }) {
   if (loading && messages.length === 0) return <MessagesSkeleton />;
 
   return (
-    <div
-      ref={containerRef}
-      onScroll={onScroll}
-      className="flex-1 overflow-y-auto px-4 py-4"
-    >
+    <div ref={containerRef} onScroll={onScroll} className="flex-1 overflow-y-auto px-4 py-4">
       {hasMore && <p className="text-center text-xs text-slate-500">Scroll up to load more...</p>}
       {messages.map((msg) => (
         <MessageBubble

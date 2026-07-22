@@ -18,7 +18,13 @@ export default [
     },
   },
   {
-    files: ['__tests__/**/*.js', '**/*.test.js', '**/*.spec.js', '__mocks__/**/*.js', 'jest.setup.js'],
+    files: [
+      '__tests__/**/*.js',
+      '**/*.test.js',
+      '**/*.spec.js',
+      '__mocks__/**/*.js',
+      'jest.setup.js',
+    ],
     languageOptions: {
       globals: {
         ...globals.node,

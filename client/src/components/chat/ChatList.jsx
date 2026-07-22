@@ -26,7 +26,8 @@ function ChatList({ type } = {}) {
   if (loadingChats) return <ChatListSkeleton />;
 
   if (sorted.length === 0) {
-    if (type === 'groups') return <p className="px-1 py-2 text-center text-[10px] text-slate-500">No groups yet</p>;
+    if (type === 'groups')
+      return <p className="px-1 py-2 text-center text-[10px] text-slate-500">No groups yet</p>;
     return null;
   }
 
@@ -52,7 +53,9 @@ function ChatList({ type } = {}) {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-1">
                   <p className="truncate text-[11px] font-medium text-slate-100">{peer.username}</p>
-                  {timeStr && <span className="flex-shrink-0 text-[8px] text-slate-500">{timeStr}</span>}
+                  {timeStr && (
+                    <span className="flex-shrink-0 text-[8px] text-slate-500">{timeStr}</span>
+                  )}
                 </div>
                 <div className="flex items-center justify-between gap-1 mt-0.5">
                   <p className="truncate text-[9px] text-slate-400">

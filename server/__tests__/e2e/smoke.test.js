@@ -93,9 +93,7 @@ async function run() {
 
   // Rate limiting check — rapid requests shouldn't crash the server (429 is fine)
   await test('Rapid requests do not crash server', async () => {
-    const results = await Promise.all(
-      Array.from({ length: 5 }).map(() => json('GET', '/health')),
-    );
+    const results = await Promise.all(Array.from({ length: 5 }).map(() => json('GET', '/health')));
     const allOk = results.every((r) => r.status === 200 || r.status === 429);
     assert(allOk, 'Server crashed on rapid requests');
   });

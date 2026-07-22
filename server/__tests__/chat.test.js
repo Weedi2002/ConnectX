@@ -85,9 +85,7 @@ describe('Chat Endpoints', () => {
 
   describe('GET /api/chats', () => {
     it('should return user chats', async () => {
-      const res = await request(app)
-        .get('/api/chats')
-        .set('Authorization', `Bearer ${token1}`);
+      const res = await request(app).get('/api/chats').set('Authorization', `Bearer ${token1}`);
 
       expect(res.status).toBe(200);
       expect(res.body).toBeDefined();

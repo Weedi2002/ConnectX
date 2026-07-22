@@ -26,17 +26,25 @@ export default function UserProfileModal({ userId, onClose }) {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    usersApi.profile(userId)
+    usersApi
+      .profile(userId)
       .then((r) => active && setUser(r.data.user))
       .catch(() => active && toast.error('Could not load profile'))
       .finally(() => active && setLoading(false));
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [userId]);
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
-        <div className="glass w-full max-w-sm rounded-3xl p-8 text-center text-slate-400">Loading...</div>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+        onClick={onClose}
+      >
+        <div className="glass w-full max-w-sm rounded-3xl p-8 text-center text-slate-400">
+          Loading...
+        </div>
       </div>
     );
   }
@@ -70,7 +78,10 @@ export default function UserProfileModal({ userId, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -89,10 +100,18 @@ export default function UserProfileModal({ userId, onClose }) {
         <div className="mt-6 space-y-2">
           {status === 'none' && (
             <>
-              <button onClick={addFriend} disabled={sending} className="glass-btn-primary w-full py-2.5 text-sm disabled:opacity-50">
+              <button
+                onClick={addFriend}
+                disabled={sending}
+                className="glass-btn-primary w-full py-2.5 text-sm disabled:opacity-50"
+              >
                 {sending ? 'Sending...' : 'Add Friend'}
               </button>
-              <button onClick={block} disabled={blocking} className="glass-card w-full !rounded-xl py-2.5 text-sm text-slate-300 disabled:opacity-50">
+              <button
+                onClick={block}
+                disabled={blocking}
+                className="glass-card w-full !rounded-xl py-2.5 text-sm text-slate-300 disabled:opacity-50"
+              >
                 Block
               </button>
             </>
@@ -114,7 +133,12 @@ export default function UserProfileModal({ userId, onClose }) {
           )}
         </div>
 
-        <button onClick={onClose} className="mt-4 w-full rounded-xl py-2.5 text-sm text-slate-400 hover:text-slate-200 transition-colors">Close</button>
+        <button
+          onClick={onClose}
+          className="mt-4 w-full rounded-xl py-2.5 text-sm text-slate-400 hover:text-slate-200 transition-colors"
+        >
+          Close
+        </button>
       </motion.div>
     </div>
   );

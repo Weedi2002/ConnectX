@@ -8,7 +8,8 @@ function VerifyEmail() {
   const [status, setStatus] = useState('verifying');
 
   useEffect(() => {
-    api.post(`/auth/verify-email/${token}`)
+    api
+      .post(`/auth/verify-email/${token}`)
       .then(() => setStatus('success'))
       .catch(() => setStatus('error'));
   }, [token]);
@@ -20,13 +21,17 @@ function VerifyEmail() {
         {status === 'success' && (
           <div>
             <p className="text-emerald-400 mb-4">Email verified successfully!</p>
-            <Link to="/login" className="glass-btn-primary inline-block px-6 py-2.5 text-sm">Sign in</Link>
+            <Link to="/login" className="glass-btn-primary inline-block px-6 py-2.5 text-sm">
+              Sign in
+            </Link>
           </div>
         )}
         {status === 'error' && (
           <div>
             <p className="text-red-400 mb-4">Verification failed or link expired.</p>
-            <Link to="/login" className="glass-btn-primary inline-block px-6 py-2.5 text-sm">Back to sign in</Link>
+            <Link to="/login" className="glass-btn-primary inline-block px-6 py-2.5 text-sm">
+              Back to sign in
+            </Link>
           </div>
         )}
       </div>

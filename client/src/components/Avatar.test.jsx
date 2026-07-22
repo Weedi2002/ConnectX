@@ -23,7 +23,9 @@ describe('Avatar', () => {
   });
 
   it('shows presence indicator when showPresence is true', () => {
-    const { container } = render(<Avatar user={{ username: 'John', presence: 'online' }} showPresence />);
+    const { container } = render(
+      <Avatar user={{ username: 'John', presence: 'online' }} showPresence />,
+    );
     expect(container.querySelector('.bg-green-500')).toBeInTheDocument();
   });
 

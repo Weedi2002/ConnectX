@@ -74,7 +74,7 @@ describe('User Model', () => {
         username: 'testuser',
         email: 'test2@example.com',
         password: 'password123',
-      })
+      }),
     ).rejects.toThrow();
   });
 

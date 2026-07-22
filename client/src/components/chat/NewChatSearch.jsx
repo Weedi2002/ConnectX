@@ -13,9 +13,14 @@ function NewChatSearch() {
   useEffect(() => {
     const id = setTimeout(async () => {
       setLoading(true);
-      try { const { data } = await api.get('/users', { params: { q: query } }); setResults(data.users); }
-      catch { setResults([]); }
-      finally { setLoading(false); }
+      try {
+        const { data } = await api.get('/users', { params: { q: query } });
+        setResults(data.users);
+      } catch {
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
     }, 300);
     return () => clearTimeout(id);
   }, [query]);

@@ -10,12 +10,18 @@ import { formatTime } from '../../utils/format.js';
 function title(n) {
   const name = n.actor?.username || n.payload?.username || 'Someone';
   switch (n.type) {
-    case 'message': return `New message from ${name}`;
-    case 'added_to_group': return `Added to ${n.payload?.chatName || 'a group'}`;
-    case 'group_updated': return `${n.payload?.chatName || 'A group'} was updated`;
-    case 'member_left': return `${name} left ${n.payload?.chatName || 'a group'}`;
-    case 'message_pinned': return `${name} pinned a message`;
-    default: return 'New notification';
+    case 'message':
+      return `New message from ${name}`;
+    case 'added_to_group':
+      return `Added to ${n.payload?.chatName || 'a group'}`;
+    case 'group_updated':
+      return `${n.payload?.chatName || 'A group'} was updated`;
+    case 'member_left':
+      return `${name} left ${n.payload?.chatName || 'a group'}`;
+    case 'message_pinned':
+      return `${name} pinned a message`;
+    default:
+      return 'New notification';
   }
 }
 
@@ -53,13 +59,21 @@ export default function NotificationsBell() {
 
   useEffect(() => {
     const last = notifications[0];
-    if (last && !last.read && !document.hasFocus() && 'Notification' in window && Notification.permission === 'granted') {
+    if (
+      last &&
+      !last.read &&
+      !document.hasFocus() &&
+      'Notification' in window &&
+      Notification.permission === 'granted'
+    ) {
       new Notification(title(last), { body: body(last) });
     }
   }, [notifications]);
 
   useEffect(() => {
-    const onClick = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const onClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
   }, []);
@@ -69,14 +83,18 @@ export default function NotificationsBell() {
       await notificationsApi.markAllRead();
       const { data } = await notificationsApi.list();
       dispatch(setNotifications(data.notifications.map((n) => ({ ...n, read: true }))));
-    } catch { toast.error('Failed'); }
+    } catch {
+      toast.error('Failed');
+    }
   };
 
   const clearAll = async () => {
     try {
       await notificationsApi.clear();
       dispatch(setNotifications([]));
-    } catch { toast.error('Failed'); }
+    } catch {
+      toast.error('Failed');
+    }
   };
 
   return (
@@ -105,8 +123,18 @@ export default function NotificationsBell() {
             <div className="flex items-center justify-between border-b border-white/[0.06] p-4">
               <p className="font-semibold text-slate-100">Notifications</p>
               <div className="flex gap-3 text-xs">
-                <button onClick={markAll} className="text-indigo-400 hover:text-indigo-300 transition-colors">Mark all read</button>
-                <button onClick={clearAll} className="text-slate-500 hover:text-slate-400 transition-colors">Clear</button>
+                <button
+                  onClick={markAll}
+                  className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                >
+                  Mark all read
+                </button>
+                <button
+                  onClick={clearAll}
+                  className="text-slate-500 hover:text-slate-400 transition-colors"
+                >
+                  Clear
+                </button>
               </div>
             </div>
             <div className="max-h-96 overflow-y-auto">
@@ -125,10 +153,14 @@ export default function NotificationsBell() {
                     <Avatar user={n.actor || { username: '?' }} size={36} />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm text-slate-100">{title(n)}</p>
-                      {body(n) && <p className="mt-0.5 truncate text-xs text-slate-400">{body(n)}</p>}
+                      {body(n) && (
+                        <p className="mt-0.5 truncate text-xs text-slate-400">{body(n)}</p>
+                      )}
                       <p className="mt-1 text-[10px] text-slate-500">{formatTime(n.createdAt)}</p>
                     </div>
-                    {!n.read && <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-indigo-400" />}
+                    {!n.read && (
+                      <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-indigo-400" />
+                    )}
                   </button>
                 ))
               )}

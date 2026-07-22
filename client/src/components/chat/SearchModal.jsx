@@ -25,31 +25,56 @@ export default function SearchModal({ onClose }) {
   const [loading, setLoading] = useState(false);
   const [profileUserId, setProfileUserId] = useState(null);
 
-  useEffect(() => { searchApi.recent().then((r) => setRecent(r.data.recentSearches)).catch(() => {}); }, []);
+  useEffect(() => {
+    searchApi
+      .recent()
+      .then((r) => setRecent(r.data.recentSearches))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(async () => {
       const term = q.trim();
-      if (!term) { setResults({ users: [], groups: [], messages: [] }); return; }
+      if (!term) {
+        setResults({ users: [], groups: [], messages: [] });
+        return;
+      }
       setLoading(true);
-      try { const { data } = await searchApi.global(term, type); setResults(data); }
-      catch { toast.error('Search failed'); }
-      finally { setLoading(false); }
+      try {
+        const { data } = await searchApi.global(term, type);
+        setResults(data);
+      } catch {
+        toast.error('Search failed');
+      } finally {
+        setLoading(false);
+      }
     }, 250);
     return () => clearTimeout(t);
   }, [q, type]);
 
   const runSearch = async (term) => {
     setQ(term);
-    try { await searchApi.addRecent(term); const { data } = await searchApi.recent(); setRecent(data.recentSearches); } catch { /* non-critical */ }
+    try {
+      await searchApi.addRecent(term);
+      const { data } = await searchApi.recent();
+      setRecent(data.recentSearches);
+    } catch {
+      /* non-critical */
+    }
   };
 
-  const openChat = (chatId) => { dispatch(setActiveChat(chatId)); onClose(); };
+  const openChat = (chatId) => {
+    dispatch(setActiveChat(chatId));
+    onClose();
+  };
   const hasContent = results.users.length || results.groups.length || results.messages.length;
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 p-4 pt-20 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 p-4 pt-20 backdrop-blur-sm"
+        onClick={onClose}
+      >
         <motion.div
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -66,12 +91,21 @@ export default function SearchModal({ onClose }) {
               placeholder="Search people, messages, files, groups..."
               className="flex-1 bg-transparent text-sm text-slate-100 outline-none placeholder:text-slate-500"
             />
-            <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200">×</button>
+            <button
+              onClick={onClose}
+              className="rounded-lg p-1 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200"
+            >
+              ×
+            </button>
           </div>
 
           <div className="flex gap-1 px-4 pt-3">
             {TABS.map((t) => (
-              <button key={t.key} onClick={() => setType(t.key)} className={`rounded-full px-3 py-1 text-xs transition-all ${type === t.key ? 'glass-btn-primary' : 'text-slate-400 hover:bg-white/[0.06]'}`}>
+              <button
+                key={t.key}
+                onClick={() => setType(t.key)}
+                className={`rounded-full px-3 py-1 text-xs transition-all ${type === t.key ? 'glass-btn-primary' : 'text-slate-400 hover:bg-white/[0.06]'}`}
+              >
                 {t.label}
               </button>
             ))}
@@ -83,7 +117,12 @@ export default function SearchModal({ onClose }) {
                 <div className="mb-2 flex items-center justify-between">
                   <p className="text-xs font-semibold text-slate-500">Recent searches</p>
                   {recent.length > 0 && (
-                    <button onClick={() => searchApi.clearRecent().then(() => setRecent([]))} className="text-xs text-slate-500 hover:text-slate-300">Clear</button>
+                    <button
+                      onClick={() => searchApi.clearRecent().then(() => setRecent([]))}
+                      className="text-xs text-slate-500 hover:text-slate-300"
+                    >
+                      Clear
+                    </button>
                   )}
                 </div>
                 {recent.length === 0 ? (
@@ -91,14 +130,22 @@ export default function SearchModal({ onClose }) {
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {recent.map((r) => (
-                      <button key={r.query} onClick={() => setQ(r.query)} className="glass-card !rounded-full px-3 py-1 text-xs text-slate-300">{r.query}</button>
+                      <button
+                        key={r.query}
+                        onClick={() => setQ(r.query)}
+                        className="glass-card !rounded-full px-3 py-1 text-xs text-slate-300"
+                      >
+                        {r.query}
+                      </button>
                     ))}
                   </div>
                 )}
               </div>
             )}
 
-            {q.trim() && !hasContent && !loading && <p className="py-8 text-center text-sm text-slate-500">No results</p>}
+            {q.trim() && !hasContent && !loading && (
+              <p className="py-8 text-center text-sm text-slate-500">No results</p>
+            )}
 
             {results.users.length > 0 && (
               <Section title="People">
@@ -117,7 +164,9 @@ export default function SearchModal({ onClose }) {
                   <Row key={g._id} onClick={() => openChat(g._id)}>
                     <Avatar user={{ username: g.name, avatar: g.avatar }} size={36} />
                     <span className="text-sm">{g.name}</span>
-                    <span className="ml-auto text-xs text-slate-500">{g.members.length} members</span>
+                    <span className="ml-auto text-xs text-slate-500">
+                      {g.members.length} members
+                    </span>
                   </Row>
                 ))}
               </Section>
@@ -129,8 +178,14 @@ export default function SearchModal({ onClose }) {
                   <Row key={m._id} onClick={() => openChat(m.chat?._id)}>
                     <Avatar user={m.sender} size={36} />
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs text-slate-500">{m.sender?.username} · {m.chat?.name || 'chat'}</p>
-                      <p className="truncate text-sm">{m.attachments?.length > 0 && !m.content ? `📎 ${m.attachments[0].name}` : m.content}</p>
+                      <p className="text-xs text-slate-500">
+                        {m.sender?.username} · {m.chat?.name || 'chat'}
+                      </p>
+                      <p className="truncate text-sm">
+                        {m.attachments?.length > 0 && !m.content
+                          ? `📎 ${m.attachments[0].name}`
+                          : m.content}
+                      </p>
                     </div>
                     <span className="text-[10px] text-slate-500">{formatTime(m.createdAt)}</span>
                   </Row>
@@ -149,9 +204,21 @@ export default function SearchModal({ onClose }) {
 }
 
 function Section({ title, children }) {
-  return <div className="mb-3"><p className="mb-1.5 text-xs font-semibold text-slate-500">{title}</p><div className="space-y-1">{children}</div></div>;
+  return (
+    <div className="mb-3">
+      <p className="mb-1.5 text-xs font-semibold text-slate-500">{title}</p>
+      <div className="space-y-1">{children}</div>
+    </div>
+  );
 }
 
 function Row({ children, onClick }) {
-  return <button onClick={onClick} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left hover:bg-white/[0.06] transition-colors">{children}</button>;
+  return (
+    <button
+      onClick={onClick}
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left hover:bg-white/[0.06] transition-colors"
+    >
+      {children}
+    </button>
+  );
 }
