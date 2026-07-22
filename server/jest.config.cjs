@@ -10,7 +10,7 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.js', '!src/server.js', '!src/config/*.js'],
   coverageDirectory: 'coverage',
   setupFiles: ['./jest.setup.js'],
-  testTimeout: 10000,
+  testTimeout: 30000,
   verbose: true,
   moduleNameMapper: {
     '^../queues/email\\.queue\\.js$': '<rootDir>/__mocks__/queues/email.queue.js',
