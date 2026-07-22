@@ -20,16 +20,16 @@ function Dashboard() {
   }, [dispatch]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-950 text-slate-100">
+    <div className="flex h-screen overflow-hidden chat-bg text-slate-100">
       <div
         className={cn(
-          'w-full border-r border-slate-800 md:w-80 lg:w-96',
-          activeChatId ? 'hidden md:block' : 'block',
+          'glass flex-shrink-0 border-r border-white/[0.06] md:w-80 lg:w-96',
+          activeChatId ? 'hidden md:flex md:flex-col' : 'flex flex-col w-full',
         )}
       >
         <Sidebar />
       </div>
-      <div className={cn('flex-1', activeChatId ? 'block' : 'hidden md:block')}>
+      <div className={cn('flex-1 min-w-0', activeChatId ? 'flex' : 'hidden md:flex')}>
         <ChatWindow />
       </div>
     </div>

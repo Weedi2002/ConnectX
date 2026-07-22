@@ -2,12 +2,12 @@ import { motion } from 'framer-motion';
 
 function AuthLayout({ title, subtitle, children }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-4">
+    <div className="flex min-h-screen items-center justify-center chat-bg p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/70 p-8 shadow-2xl backdrop-blur"
+        className="glass w-full max-w-md rounded-3xl p-8 shadow-glass"
       >
         <h1 className="bg-gradient-to-r from-indigo-400 to-fuchsia-400 bg-clip-text text-center text-3xl font-bold text-transparent">
           ConnectX
@@ -21,9 +21,9 @@ function AuthLayout({ title, subtitle, children }) {
 }
 
 export const inputClass =
-  'w-full rounded-lg border border-slate-700 bg-slate-800/60 px-4 py-2.5 text-slate-100 placeholder-slate-500 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500';
+  'glass-input w-full px-4 py-2.5 text-sm';
 
 export const buttonClass =
-  'w-full rounded-lg bg-gradient-to-r from-indigo-500 to-fuchsia-500 px-4 py-2.5 font-medium text-white transition hover:opacity-90 disabled:opacity-50';
+  'glass-btn-primary w-full py-2.5 text-sm';
 
 export default AuthLayout;

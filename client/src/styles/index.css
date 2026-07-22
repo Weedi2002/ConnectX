@@ -12,3 +12,128 @@ body,
   height: 100%;
   margin: 0;
 }
+
+/* ─── Glassmorphism utilities ─── */
+@layer components {
+  .glass {
+    background: rgba(15, 25, 35, 0.65);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-light {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-card {
+    background: rgba(15, 25, 35, 0.5);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .glass-card:hover {
+    background: rgba(20, 35, 50, 0.6);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .glass-input {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9999px;
+    color: #e2e8f0;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .glass-input::placeholder {
+    color: rgba(148, 163, 184, 0.6);
+  }
+
+  .glass-input:focus {
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+  }
+
+  .glass-btn {
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 9999px;
+    color: #c7d2fe;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .glass-btn:hover {
+    background: rgba(99, 102, 241, 0.35);
+    border-color: rgba(99, 102, 241, 0.5);
+  }
+
+  .glass-btn-primary {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.7), rgba(168, 85, 247, 0.7));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .glass-btn-primary:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.85), rgba(168, 85, 247, 0.85));
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  }
+
+  .glass-bubble-own {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(139, 92, 246, 0.35));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .glass-bubble-other {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* ─── Chat background ─── */
+.chat-bg {
+  background:
+    linear-gradient(135deg, rgba(10, 26, 31, 0.85), rgba(15, 36, 48, 0.9)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Cdefs%3E%3CradialGradient id='a' cx='400' cy='300' r='400' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%2300c9ff' stop-opacity='0.12'/%3E%3Cstop offset='1' stop-color='%230a1a1f' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect fill='url(%23a)' width='800' height='600'/%3E%3Ccircle cx='100' cy='500' r='180' fill='%2322c55e' opacity='0.06'/%3E%3Ccircle cx='700' cy='100' r='200' fill='%2322c55e' opacity='0.05'/%3E%3Ccircle cx='600' cy='500' r='140' fill='%2316a34a' opacity='0.04'/%3E%3Cellipse cx='200' cy='150' rx='120' ry='60' fill='%2322c55e' opacity='0.04' transform='rotate(-20 200 150)'/%3E%3Cellipse cx='650' cy='400' rx='100' ry='50' fill='%2316a34a' opacity='0.05' transform='rotate(15 650 400)'/%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ─── Sidebar active nav indicator ─── */
+.nav-active {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  box-shadow: inset 0 0 12px rgba(99, 102, 241, 0.15);
+}

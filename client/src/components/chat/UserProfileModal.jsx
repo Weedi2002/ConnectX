@@ -24,22 +24,17 @@ export default function UserProfileModal({ userId, onClose }) {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    usersApi
-      .profile(userId)
+    usersApi.profile(userId)
       .then((r) => active && setUser(r.data.user))
       .catch(() => active && toast.error('Could not load profile'))
       .finally(() => active && setLoading(false));
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [userId]);
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-        <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900 p-6 text-center text-slate-400">
-          Loading...
-        </div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
+        <div className="glass w-full max-w-sm rounded-3xl p-8 text-center text-slate-400">Loading...</div>
       </div>
     );
   }
@@ -47,33 +42,16 @@ export default function UserProfileModal({ userId, onClose }) {
 
   const status = relStatus(lists, user._id);
 
-  const addFriend = async () => {
-    try {
-      await dispatch(sendRequest(user._id));
-      toast.success('Friend request sent');
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed');
-    }
-  };
-
-  const block = async () => {
-    try {
-      setBlocking(true);
-      await dispatch(blockUser(user._id));
-      toast.success('User blocked');
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed');
-    } finally {
-      setBlocking(false);
-    }
-  };
+  const addFriend = async () => { try { await dispatch(sendRequest(user._id)); toast.success('Friend request sent'); } catch (err) { toast.error(err.response?.data?.error || 'Failed'); } };
+  const block = async () => { try { setBlocking(true); await dispatch(blockUser(user._id)); toast.success('User blocked'); } catch (err) { toast.error(err.response?.data?.error || 'Failed'); } finally { setBlocking(false); } };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm" onClick={onClose}>
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900 p-6"
+        className="glass w-full max-w-sm rounded-3xl p-6 shadow-glass"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col items-center text-center">
           <Avatar user={user} size={88} showPresence />
@@ -87,48 +65,16 @@ export default function UserProfileModal({ userId, onClose }) {
         <div className="mt-6 space-y-2">
           {status === 'none' && (
             <>
-              <button
-                onClick={addFriend}
-                className="w-full rounded-lg bg-gradient-to-r from-indigo-500 to-fuchsia-500 py-2 text-sm font-medium text-white"
-              >
-                Add Friend
-              </button>
-              <button
-                onClick={block}
-                disabled={blocking}
-                className="w-full rounded-lg bg-slate-800 py-2 text-sm text-slate-200 hover:bg-slate-700"
-              >
-                Block
-              </button>
+              <button onClick={addFriend} className="glass-btn-primary w-full py-2.5 text-sm">Add Friend</button>
+              <button onClick={block} disabled={blocking} className="glass-card w-full !rounded-xl py-2.5 text-sm text-slate-300">Block</button>
             </>
           )}
-          {status === 'sent' && (
-            <p className="rounded-lg bg-slate-800 py-2 text-center text-sm text-slate-400">
-              Friend request sent
-            </p>
-          )}
-          {status === 'incoming' && (
-            <p className="rounded-lg bg-slate-800 py-2 text-center text-sm text-emerald-400">
-              This user sent you a friend request
-            </p>
-          )}
-          {status === 'blocked' && (
-            <button
-              onClick={block}
-              disabled={blocking}
-              className="w-full rounded-lg bg-slate-800 py-2 text-sm text-slate-200 hover:bg-slate-700"
-            >
-              Unblock
-            </button>
-          )}
+          {status === 'sent' && <p className="glass-card w-full !rounded-xl py-2.5 text-center text-sm text-slate-400">Friend request sent</p>}
+          {status === 'incoming' && <p className="glass-card w-full !rounded-xl py-2.5 text-center text-sm text-emerald-400">This user sent you a friend request</p>}
+          {status === 'blocked' && <button onClick={block} disabled={blocking} className="glass-card w-full !rounded-xl py-2.5 text-sm text-slate-300">Unblock</button>}
         </div>
 
-        <button
-          onClick={onClose}
-          className="mt-4 w-full rounded-lg py-2 text-sm text-slate-400 hover:text-slate-200"
-        >
-          Close
-        </button>
+        <button onClick={onClose} className="mt-4 w-full rounded-xl py-2.5 text-sm text-slate-400 hover:text-slate-200 transition-colors">Close</button>
       </motion.div>
     </div>
   );

@@ -7,7 +7,6 @@ import { api } from '../../services/api.js';
 import { removeMessage, setReplyTo, updateMessage } from '../../redux/chatSlice.js';
 import { formatTime, formatBytes } from '../../utils/format.js';
 import { cn } from '../../utils/cn.js';
-import Avatar from '../Avatar.jsx';
 import Markdown from './Markdown.jsx';
 import VoiceMessage from './VoiceMessage.jsx';
 
@@ -22,13 +21,13 @@ function Attachment({ att }) {
           src={att.url}
           alt={att.name}
           loading="lazy"
-          className="max-h-64 rounded-lg object-cover"
+          className="max-h-64 rounded-xl object-cover"
         />
       </a>
     );
   }
   if (att.type === 'video') {
-    return <video src={att.url} controls className="max-h-64 rounded-lg" />;
+    return <video src={att.url} controls className="max-h-64 rounded-xl" />;
   }
   return (
     <a
@@ -36,7 +35,7 @@ function Attachment({ att }) {
       target="_blank"
       rel="noreferrer"
       download
-      className="flex items-center gap-2 rounded-lg bg-slate-700/50 px-3 py-2 text-sm hover:bg-slate-700"
+      className="glass-card flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/[0.08]"
     >
       <span className="text-lg">📄</span>
       <span className="min-w-0">
@@ -52,8 +51,8 @@ function ReplyPreview({ replyTo, own }) {
   return (
     <div
       className={cn(
-        'mb-1 flex items-center gap-2 rounded-lg border-l-2 px-2 py-1 text-xs',
-        own ? 'border-white/60 bg-white/10' : 'border-indigo-400 bg-slate-700/50',
+        'mb-1.5 flex items-center gap-2 rounded-lg border-l-2 px-2.5 py-1.5 text-xs',
+        own ? 'border-white/40 bg-white/10' : 'border-indigo-400/60 bg-white/[0.04]',
       )}
     >
       <span className="font-semibold">{replyTo.sender?.username || 'User'}</span>
@@ -71,16 +70,16 @@ const receipt = { sent: '✓', delivered: '✓✓', read: '✓✓' };
 function ReactionBar({ reactions, onReact }) {
   const grouped = {};
   reactions.forEach((r) => {
-    grouped[r.emoji] = grouped[r.emoji] || { emoji: r.emoji, count: 0, mine: false };
+    grouped[r.emoji] = grouped[r.emoji] || { emoji: r.emoji, count: 0 };
     grouped[r.emoji].count += 1;
   });
   return (
-    <div className="mt-1 flex flex-wrap gap-1">
+    <div className="mt-1.5 flex flex-wrap gap-1">
       {Object.values(grouped).map((r) => (
         <button
           key={r.emoji}
           onClick={() => onReact(r.emoji)}
-          className="rounded-full bg-slate-700/70 px-2 py-0.5 text-xs hover:bg-slate-600"
+          className="glass-card rounded-full px-2 py-0.5 text-xs hover:bg-white/[0.1]"
         >
           {r.emoji} {r.count}
         </button>
@@ -155,17 +154,11 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
 
   const handleTranslate = async () => {
     setMenu(false);
-    if (translated !== null) {
-      setTranslated(null);
-      return;
-    }
+    if (translated !== null) { setTranslated(null); return; }
     if (!message.content) return;
     setTranslating(true);
     try {
-      const { data } = await api.post('/ai/translate', {
-        text: message.content,
-        target: 'English',
-      });
+      const { data } = await api.post('/ai/translate', { text: message.content, target: 'English' });
       setTranslated(data.translated);
     } catch {
       toast.error('Translation failed');
@@ -187,22 +180,22 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
     >
       <div
         className={cn(
-          'max-w-[75%] rounded-2xl px-3 py-2 text-sm',
+          'max-w-[75%] rounded-2xl px-3.5 py-2.5 text-sm',
           own
-            ? 'rounded-br-sm bg-gradient-to-r from-indigo-500 to-fuchsia-500 text-white'
-            : 'rounded-bl-sm bg-slate-800 text-slate-100',
+            ? 'glass-bubble-own rounded-br-md'
+            : 'glass-bubble-other rounded-bl-md',
         )}
       >
         {isGroup && !own && (
           <p className="mb-0.5 text-xs font-semibold text-indigo-300">{message.sender?.username}</p>
         )}
 
-        {message.forwardedFrom && <p className="mb-0.5 text-[10px] opacity-70">↪ Forwarded</p>}
+        {message.forwardedFrom && <p className="mb-0.5 text-[10px] opacity-60">↪ Forwarded</p>}
 
         <ReplyPreview replyTo={message.replyTo} own={own} />
 
         {message.attachments?.length > 0 && (
-          <div className="mb-1 space-y-2">
+          <div className="mb-1.5 space-y-2">
             {message.attachments.map((att, i) => (
               <Attachment key={i} att={att} />
             ))}
@@ -210,18 +203,18 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
         )}
         {message.content && <Markdown>{message.content}</Markdown>}
         {translated !== null && (
-          <div className="mt-1 rounded-lg border border-indigo-500/30 bg-indigo-500/5 p-2 text-xs text-slate-300">
-            <span className="mr-1 opacity-70">🌐</span>
+          <div className="mt-1.5 rounded-lg border border-indigo-500/20 bg-indigo-500/[0.08] px-3 py-2 text-xs text-slate-300">
+            <span className="mr-1 opacity-60">🌐</span>
             {translated}
           </div>
         )}
 
-        {message.edited && <span className="ml-1 text-[10px] opacity-60">(edited)</span>}
+        {message.edited && <span className="ml-1 text-[10px] opacity-50">(edited)</span>}
 
-        <div className="mt-1 flex items-center justify-end gap-1 text-[10px] opacity-70">
+        <div className="mt-1 flex items-center justify-end gap-1.5 text-[10px] opacity-60">
           <span>{formatTime(message.createdAt)}</span>
           {own && (
-            <span className={message.status === 'read' ? 'text-sky-300' : ''}>
+            <span className={message.status === 'read' ? 'text-sky-300 opacity-100' : ''}>
               {receipt[message.status] || '✓'}
             </span>
           )}
@@ -242,76 +235,44 @@ function MessageBubble({ message, own, isGroup, chatId, onForward }) {
         {menu && (
           <div
             className={cn(
-              'absolute z-20 mt-1 w-36 rounded-lg border border-slate-700 bg-slate-900 p-1 text-xs shadow-xl',
+              'absolute z-20 mt-1 w-40 glass rounded-xl p-1.5 shadow-glass',
               own ? 'right-0' : 'left-0',
             )}
           >
-            <button
-              onClick={handleReply}
-              className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
-            >
+            <button onClick={handleReply} className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs hover:bg-white/[0.08]">
               ↩ Reply
             </button>
-            <button
-              onClick={() => setPicker((p) => !p)}
-              className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
-            >
+            <button onClick={() => setPicker((p) => !p)} className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs hover:bg-white/[0.08]">
               😊 React
             </button>
-            <button
-              onClick={handlePin}
-              className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
-            >
+            <button onClick={handlePin} className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs hover:bg-white/[0.08]">
               📌 {message.pinned ? 'Unpin' : 'Pin'}
             </button>
-            <button
-              onClick={handleBookmark}
-              className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
-            >
+            <button onClick={handleBookmark} className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs hover:bg-white/[0.08]">
               🔖 Bookmark
             </button>
             {own && (
-              <button
-                onClick={handleEdit}
-                className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
-              >
+              <button onClick={handleEdit} className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs hover:bg-white/[0.08]">
                 ✏️ Edit
               </button>
             )}
             <button
-              onClick={() => {
-                setMenu(false);
-                onForward?.(message);
-              }}
-              className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
+              onClick={() => { setMenu(false); onForward?.(message); }}
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs hover:bg-white/[0.08]"
             >
               ➡️ Forward
             </button>
             {own && (
-              <button
-                onClick={handleDelete}
-                className="block w-full rounded px-2 py-1 text-left text-red-400 hover:bg-slate-800"
-              >
+              <button onClick={handleDelete} className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs text-red-400 hover:bg-white/[0.08]">
                 🗑 Delete
               </button>
             )}
-            <button
-              onClick={handleCopy}
-              className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
-            >
+            <button onClick={handleCopy} className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs hover:bg-white/[0.08]">
               📋 Copy
             </button>
             {message.content && (
-              <button
-                onClick={handleTranslate}
-                className="block w-full rounded px-2 py-1 text-left hover:bg-slate-800"
-                title="Translate to English"
-              >
-                {translating
-                  ? '⏳ Translating…'
-                  : translated !== null
-                    ? '↺ Show original'
-                    : '🌐 Translate'}
+              <button onClick={handleTranslate} className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs hover:bg-white/[0.08]" title="Translate to English">
+                {translating ? '⏳ Translating…' : translated !== null ? '↺ Show original' : '🌐 Translate'}
               </button>
             )}
           </div>

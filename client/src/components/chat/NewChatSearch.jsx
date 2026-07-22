@@ -13,14 +13,9 @@ function NewChatSearch() {
   useEffect(() => {
     const id = setTimeout(async () => {
       setLoading(true);
-      try {
-        const { data } = await api.get('/users', { params: { q: query } });
-        setResults(data.users);
-      } catch {
-        setResults([]);
-      } finally {
-        setLoading(false);
-      }
+      try { const { data } = await api.get('/users', { params: { q: query } }); setResults(data.users); }
+      catch { setResults([]); }
+      finally { setLoading(false); }
     }, 300);
     return () => clearTimeout(id);
   }, [query]);
@@ -32,12 +27,12 @@ function NewChatSearch() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search users..."
-        className="mb-3 w-full rounded-lg border border-slate-700 bg-slate-800/60 px-3 py-2 text-sm text-slate-100 outline-none focus:border-indigo-500"
+        className="glass-input mb-3 w-full px-4 py-2.5 text-sm"
       />
       {loading ? (
         <div className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full" />
+            <Skeleton key={i} className="glass-card h-14 !rounded-xl" />
           ))}
         </div>
       ) : (
@@ -46,11 +41,11 @@ function NewChatSearch() {
             <li key={u._id}>
               <button
                 onClick={() => setProfileId(u._id)}
-                className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-slate-800"
+                className="glass-card flex w-full items-center gap-3 !rounded-xl px-3 py-3 text-left"
               >
                 <Avatar user={u} size={36} showPresence />
                 <div className="min-w-0">
-                  <p className="text-sm font-medium">{u.username}</p>
+                  <p className="text-sm font-medium text-slate-100">{u.username}</p>
                   <p className="truncate text-xs text-slate-400">{u.bio}</p>
                 </div>
               </button>

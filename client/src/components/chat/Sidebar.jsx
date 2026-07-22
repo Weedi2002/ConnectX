@@ -7,18 +7,23 @@ import ChatList from './ChatList.jsx';
 import NewChatSearch from './NewChatSearch.jsx';
 import CreateGroupModal from './CreateGroupModal.jsx';
 import SearchModal from './SearchModal.jsx';
-import NotificationsBell from './NotificationsBell.jsx';
 import FriendRequestsPanel from './FriendRequestsPanel.jsx';
 import { logout } from '../../redux/authSlice.js';
-import { toggleTheme } from '../../redux/themeSlice.js';
 import { disconnectSocket } from '../../services/socket.js';
+
+const NAV_ITEMS = [
+  { key: 'home', icon: '🏠', label: 'Home' },
+  { key: 'chat', icon: '💬', label: 'Chats' },
+  { key: 'friends', icon: '👥', label: 'Friends' },
+  { key: 'notifications', icon: '🔔', label: 'Notifications' },
+  { key: 'settings', icon: '⚙️', label: 'Settings' },
+];
 
 function Sidebar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((s) => s.auth.user);
-  const theme = useSelector((s) => s.theme.mode);
-  const [searching, setSearching] = useState(false);
+  const [activeNav, setActiveNav] = useState('chat');
   const [creatingGroup, setCreatingGroup] = useState(false);
   const [globalSearch, setGlobalSearch] = useState(false);
   const [friendsOpen, setFriendsOpen] = useState(false);
@@ -30,82 +35,100 @@ function Sidebar() {
     toast.success('Signed out');
   };
 
+  const handleNav = (key) => {
+    if (key === 'settings') return navigate('/settings');
+    if (key === 'friends') return setFriendsOpen(true);
+    setActiveNav(key);
+  };
+
   return (
-    <div className="flex h-full flex-col bg-slate-900">
-      <header className="flex items-center justify-between border-b border-slate-800 p-4">
-        <button
-          onClick={() => navigate('/settings')}
-          className="flex items-center gap-3"
-          title="Settings"
-        >
-          <Avatar user={user} size={40} showPresence />
-          <div className="text-left">
-            <p className="text-sm font-semibold">{user?.username}</p>
-            <p className="text-xs text-slate-400">View profile</p>
-          </div>
+    <>
+      {/* Vertical nav rail */}
+      <div className="flex flex-col items-center gap-1 py-4 px-2 border-r border-white/[0.06]">
+        <button onClick={() => navigate('/settings')} className="mb-3" title="Profile">
+          <Avatar user={user} size={36} showPresence />
         </button>
-        <div className="flex items-center gap-1">
-          <NotificationsBell />
+
+        {NAV_ITEMS.map((item) => (
           <button
-            onClick={() => setFriendsOpen(true)}
-            className="relative rounded-lg p-2 text-slate-400 hover:bg-slate-800"
-            title="Friend requests"
+            key={item.key}
+            onClick={() => handleNav(item.key)}
+            className={`relative flex h-10 w-10 items-center justify-center rounded-xl text-lg transition-all duration-200 ${
+              activeNav === item.key
+                ? 'nav-active'
+                : 'text-slate-400 hover:bg-white/[0.06] hover:text-slate-200'
+            }`}
+            title={item.label}
           >
-            👥
-            {friendUnread > 0 && (
+            {item.icon}
+            {item.key === 'friends' && friendUnread > 0 && (
               <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                 {friendUnread > 99 ? '99+' : friendUnread}
               </span>
             )}
           </button>
-          <button
-            onClick={() => dispatch(toggleTheme())}
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-800"
-            title="Toggle theme"
-          >
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </button>
-          <button
-            onClick={handleLogout}
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-800"
-            title="Logout"
-          >
-            ⎋
-          </button>
-        </div>
-      </header>
+        ))}
 
-      <div className="flex gap-2 p-3">
+        <div className="mt-auto" />
+
         <button
-          onClick={() => setGlobalSearch(true)}
-          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-slate-200 hover:bg-slate-700"
-          title="Search"
+          onClick={handleLogout}
+          className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition-all hover:bg-red-500/10 hover:text-red-400"
+          title="Logout"
         >
-          🔍
-        </button>
-        <button
-          onClick={() => setSearching((v) => !v)}
-          className="flex-1 rounded-lg bg-gradient-to-r from-indigo-500 to-fuchsia-500 py-2 text-sm font-medium text-white"
-        >
-          {searching ? 'Close search' : '+ New chat'}
-        </button>
-        <button
-          onClick={() => setCreatingGroup(true)}
-          className="rounded-lg bg-slate-800 px-3 py-2 text-sm font-medium text-slate-200 hover:bg-slate-700"
-          title="New group"
-        >
-          👥
+          🚪
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        {searching ? <NewChatSearch onDone={() => setSearching(false)} /> : <ChatList />}
+      {/* Chat list panel */}
+      <div className="flex flex-1 flex-col min-w-0">
+        {/* Search header */}
+        <div className="px-4 pt-4 pb-2">
+          <div className="glass-input flex items-center gap-2 px-4 py-2.5">
+            <span className="text-slate-400 text-sm">🔍</span>
+            <input
+              type="text"
+              placeholder="Search..."
+              onClick={() => setGlobalSearch(true)}
+              readOnly
+              className="flex-1 bg-transparent text-sm text-slate-200 outline-none cursor-pointer placeholder:text-slate-500"
+            />
+          </div>
+        </div>
+
+        {/* Sections */}
+        <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-3">
+          {/* Groups section */}
+          <div>
+            <p className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Groups
+            </p>
+          </div>
+
+          {/* Person section */}
+          <div>
+            <div className="flex items-center justify-between px-2 py-1.5">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                Person
+              </p>
+              <button
+                onClick={() => setCreatingGroup(true)}
+                className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
+                title="New group"
+              >
+                + New Group
+              </button>
+            </div>
+          </div>
+
+          <ChatList />
+        </div>
       </div>
 
       {creatingGroup && <CreateGroupModal onClose={() => setCreatingGroup(false)} />}
       {globalSearch && <SearchModal onClose={() => setGlobalSearch(false)} />}
       {friendsOpen && <FriendRequestsPanel onClose={() => setFriendsOpen(false)} />}
-    </div>
+    </>
   );
 }
 

@@ -54,9 +54,7 @@ function ChatWindow() {
     api.get(`/messages/${activeChatId}/pinned`).then((r) => {
       if (active) setPinned(r.data.messages);
     });
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [activeChatId]);
 
   const handleForward = (msg) => setForwardMsg(msg);
@@ -107,14 +105,16 @@ function ChatWindow() {
     return () => socket?.off('message:updated', refreshPinned);
   }, [activeChatId]);
 
+  /* ── Empty state ── */
   if (!activeChatId || !chat) {
     return (
-      <div className="flex h-full items-center justify-center bg-slate-950">
+      <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/20 text-4xl">
+          <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-3xl glass-card text-5xl">
             💬
           </div>
-          <p className="text-slate-400">Select a chat to start messaging</p>
+          <p className="text-lg font-medium text-slate-300">Select a chat</p>
+          <p className="text-sm text-slate-500 mt-1">Pick a conversation to start messaging</p>
         </div>
       </div>
     );
@@ -132,29 +132,43 @@ function ChatWindow() {
         : `Last seen ${formatLastSeen(peer?.lastSeen)}`;
 
   return (
-    <div className="relative flex h-full bg-slate-950">
-      <div className="flex h-full min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-3 border-b border-slate-800 bg-slate-900 p-3">
+    <div className="relative flex h-full flex-col min-w-0">
+      {/* ── Glass Header ── */}
+      <header className="glass flex items-center gap-3 px-4 py-3 border-b border-white/[0.06]">
+        <button
+          onClick={() => dispatch(setActiveChat(null))}
+          className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200 transition-colors md:hidden"
+        >
+          ←
+        </button>
+        <button
+          onClick={() => isGroup && setShowInfo((v) => !v)}
+          className="flex min-w-0 items-center gap-3 text-left"
+        >
+          <Avatar user={headerAvatar} size={40} showPresence={!isGroup} />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-slate-100">{peer?.username || chat.name}</p>
+            <p className="truncate text-xs text-slate-400">{subtitle}</p>
+          </div>
+        </button>
+
+        <div className="ml-auto flex items-center gap-1">
           <button
-            onClick={() => dispatch(setActiveChat(null))}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 md:hidden"
+            className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200 transition-colors"
+            title="Voice call"
           >
-            ←
+            📞
           </button>
           <button
-            onClick={() => isGroup && setShowInfo((v) => !v)}
-            className="flex min-w-0 items-center gap-3 text-left"
+            className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200 transition-colors"
+            title="Video call"
           >
-            <Avatar user={headerAvatar} size={40} showPresence={!isGroup} />
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold">{peer?.username || chat.name}</p>
-              <p className="truncate text-xs text-slate-400">{subtitle}</p>
-            </div>
+            📹
           </button>
           {isGroup && (
             <button
               onClick={() => setShowInfo((v) => !v)}
-              className="ml-auto rounded-lg p-2 text-slate-400 hover:bg-slate-800"
+              className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200 transition-colors"
               title="Group info"
             >
               ⓘ
@@ -162,14 +176,14 @@ function ChatWindow() {
           )}
           <button
             onClick={() => toggleSetting('pinned')}
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-800"
+            className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200 transition-colors"
             title="Pin chat"
           >
             {settings.pinned ? '📌' : '📍'}
           </button>
           <button
             onClick={() => toggleSetting('favorite')}
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-800"
+            className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200 transition-colors"
             title="Favorite"
           >
             {settings.favorite ? '⭐' : '☆'}
@@ -177,37 +191,43 @@ function ChatWindow() {
           <button
             onClick={handleSmartReply}
             disabled={aiBusy}
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 disabled:opacity-50"
+            className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.06] hover:text-slate-200 transition-colors disabled:opacity-50"
             title="AI smart replies"
           >
             {aiBusy ? '⏳' : '✨'}
           </button>
-        </header>
+        </div>
+      </header>
 
-        <MessageList chatId={activeChatId} isGroup={isGroup} onForward={handleForward} />
-        <MessageInput
-          chatId={activeChatId}
-          suggestions={suggestions}
-          onUseSuggestion={() => setSuggestions([])}
-          onSummarize={handleSummarize}
-          aiBusy={aiBusy}
-        />
+      {/* ── Messages ── */}
+      <MessageList chatId={activeChatId} isGroup={isGroup} onForward={handleForward} />
 
-        {pinned.length > 0 && (
-          <div className="flex items-center gap-2 border-t border-slate-800 bg-slate-900/80 px-4 py-1.5 text-xs text-slate-300">
-            <span className="text-sm">📌</span>
-            <span className="truncate">
-              <span className="font-semibold">{pinned[0].sender?.username}: </span>
-              {pinned[0].content || '📎 attachment'}
+      {/* ── Pinned bar ── */}
+      {pinned.length > 0 && (
+        <div className="glass-light flex items-center gap-2 mx-3 mb-2 rounded-xl px-4 py-2 text-xs text-slate-300">
+          <span className="text-sm">📌</span>
+          <span className="truncate">
+            <span className="font-semibold">{pinned[0].sender?.username}: </span>
+            {pinned[0].content || '📎 attachment'}
+          </span>
+          {pinned.length > 1 && (
+            <span className="ml-auto whitespace-nowrap text-slate-500">
+              +{pinned.length - 1} more
             </span>
-            {pinned.length > 1 && (
-              <span className="ml-auto whitespace-nowrap text-slate-500">
-                +{pinned.length - 1} more
-              </span>
-            )}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Input ── */}
+      <MessageInput
+        chatId={activeChatId}
+        suggestions={suggestions}
+        onUseSuggestion={() => setSuggestions([])}
+        onSummarize={handleSummarize}
+        aiBusy={aiBusy}
+      />
+
+      {forwardMsg && <ForwardModal message={forwardMsg} onClose={() => setForwardMsg(null)} />}
 
       {isGroup && showInfo && (
         <div className="absolute inset-0 z-20 md:static md:inset-auto">
@@ -215,27 +235,25 @@ function ChatWindow() {
         </div>
       )}
 
-      {forwardMsg && <ForwardModal message={forwardMsg} onClose={() => setForwardMsg(null)} />}
-
       {summary !== null && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           onClick={() => setSummary(null)}
         >
           <div
-            className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-xl"
+            className="glass max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-3xl p-6 shadow-glass"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between">
               <p className="text-lg font-semibold text-slate-100">✨ Conversation summary</p>
               <button
                 onClick={() => setSummary(null)}
-                className="text-slate-400 hover:text-red-400"
+                className="rounded-lg p-1 text-slate-400 hover:bg-white/[0.06] hover:text-red-400"
               >
                 ×
               </button>
             </div>
-            <div className="whitespace-pre-wrap text-sm text-slate-200">{summary}</div>
+            <div className="whitespace-pre-wrap text-sm text-slate-200 leading-relaxed">{summary}</div>
           </div>
         </div>
       )}

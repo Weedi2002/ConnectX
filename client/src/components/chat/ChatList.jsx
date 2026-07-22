@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActiveChat } from '../../redux/chatSlice.js';
 import { ChatListSkeleton } from '../Skeleton.jsx';
@@ -11,112 +11,77 @@ function otherMember(chat, userId) {
   return chat.members?.find((m) => m._id !== userId) || chat.members?.[0] || {};
 }
 
-const FILTERS = [
-  { key: 'all', label: 'All' },
-  { key: 'pinned', label: '📌 Pinned' },
-  { key: 'favorite', label: '⭐ Fav' },
-  { key: 'archived', label: '📥 Archived' },
-];
-
 function ChatList() {
   const dispatch = useDispatch();
-  const { chats, loadingChats, activeChatId, settingsByChat, unreadByChat } = useSelector(
-    (s) => s.chat,
-  );
+  const { chats, loadingChats, activeChatId, unreadByChat } = useSelector((s) => s.chat);
   const userId = useSelector((s) => s.auth.user?._id);
-  const [filter, setFilter] = useState('all');
 
-  const visible = useMemo(() => {
-    const withSettings = chats.map((c) => ({ ...c, _s: settingsByChat[c._id] || {} }));
-    let list = withSettings;
-    if (filter === 'pinned') list = withSettings.filter((c) => c._s.pinned);
-    else if (filter === 'favorite') list = withSettings.filter((c) => c._s.favorite);
-    else if (filter === 'archived') list = withSettings.filter((c) => c._s.archived);
-    else list = withSettings.filter((c) => !c._s.archived);
-
-    if (filter === 'all') {
-      list = [...list].sort((a, b) => {
-        if (a._s.pinned !== b._s.pinned) return a._s.pinned ? -1 : 1;
-        return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
-      });
-    }
-    return list;
-  }, [chats, settingsByChat, filter]);
+  const sorted = useMemo(() => {
+    return [...chats].sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0));
+  }, [chats]);
 
   if (loadingChats) return <ChatListSkeleton />;
 
-  return (
-    <div>
-      <div className="flex gap-1 px-3 py-2">
-        {FILTERS.map((f) => (
-          <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
-            className={cn(
-              'rounded-full px-2.5 py-1 text-xs',
-              filter === f.key
-                ? 'bg-indigo-500 text-white'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700',
-            )}
-          >
-            {f.label}
-          </button>
-        ))}
+  if (sorted.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-2xl glass-card text-2xl">
+          💬
+        </div>
+        <p className="text-sm text-slate-400">No chats yet</p>
+        <p className="text-xs text-slate-500 mt-1">Start a conversation!</p>
       </div>
+    );
+  }
 
-      {visible.length === 0 ? (
-        <p className="p-6 text-center text-sm text-slate-500">
-          {filter === 'all' ? 'No chats yet. Start one!' : `No ${filter} chats`}
-        </p>
-      ) : (
-        <ul>
-          {visible.map((chat) => {
-            const peer = otherMember(chat, userId);
-            const last = chat.lastMessage;
-            const muted = chat._s.muted;
-            return (
-              <li key={chat._id}>
-                <button
-                  onClick={() => dispatch(setActiveChat(chat._id))}
-                  className={cn(
-                    'flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-slate-800/60',
-                    activeChatId === chat._id && 'bg-slate-800',
+  return (
+    <ul className="space-y-1.5">
+      {sorted.map((chat) => {
+        const peer = otherMember(chat, userId);
+        const last = chat.lastMessage;
+        const unread = unreadByChat[chat._id];
+        const isActive = activeChatId === chat._id;
+        const timeStr = last ? formatTime(last.createdAt) : '';
+
+        return (
+          <li key={chat._id}>
+            <button
+              onClick={() => dispatch(setActiveChat(chat._id))}
+              className={cn(
+                'glass-card flex w-full items-center gap-3 px-3 py-3 text-left',
+                isActive && '!bg-indigo-500/15 !border-indigo-500/25 shadow-glow',
+              )}
+            >
+              <div className="relative flex-shrink-0">
+                <Avatar user={peer} size={44} showPresence={!chat.isGroup} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="truncate text-sm font-medium text-slate-100">
+                    {peer.username}
+                  </p>
+                  {timeStr && (
+                    <span className="flex-shrink-0 text-[10px] text-slate-500">{timeStr}</span>
                   )}
-                >
-                  <Avatar user={peer} size={44} showPresence={!chat.isGroup} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="truncate text-sm font-medium">
-                        {chat._s.pinned && '📌 '}
-                        {peer.username}
-                      </p>
-                      <div className="flex items-center gap-1">
-                        {unreadByChat[chat._id] > 0 && (
-                          <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                            {unreadByChat[chat._id] > 99 ? '99+' : unreadByChat[chat._id]}
-                          </span>
-                        )}
-                        {last && (
-                          <span className="text-[10px] text-slate-500">
-                            {formatTime(last.createdAt)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <p className="flex items-center gap-1 truncate text-xs text-slate-400">
-                      {muted && <span title="Muted">🔕</span>}
-                      {last?.attachments?.length
-                        ? '📎 Attachment'
-                        : last?.content || 'No messages yet'}
-                    </p>
-                  </div>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
+                </div>
+                <div className="flex items-center justify-between gap-2 mt-0.5">
+                  <p className="truncate text-xs text-slate-400">
+                    {last?.attachments?.length
+                      ? '📎 Attachment'
+                      : last?.content || 'No messages yet'}
+                  </p>
+                  {unread > 0 && (
+                    <span className="flex h-5 min-w-5 flex-shrink-0 items-center justify-center rounded-full bg-indigo-500 px-1.5 text-[10px] font-bold text-white">
+                      {unread > 99 ? '99+' : unread}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </button>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
