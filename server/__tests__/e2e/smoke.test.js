@@ -38,17 +38,16 @@ async function json(method, path, { body, token } = {}) {
 }
 
 async function run() {
-  console.log('\n🔗 E2E Smoke Tests (dev server)\n');
+  console.log('\n  E2E Smoke Tests (dev server)\n');
 
   // Health
-  await test('GET /api/health → 200', async () => {
-    const { status } = await json('GET', '/api/health');
+  await test('GET /health → 200', async () => {
+    const { status } = await json('GET', '/health');
     assert(status === 200, `Expected 200, got ${status}`);
   });
 
   // Register
   let token;
-  let userId;
   await test('POST /api/auth/register → 201', async () => {
     const email = `smoke_${Date.now()}@test.com`;
     const { status, data } = await json('POST', '/api/auth/register', {
@@ -57,16 +56,14 @@ async function run() {
     assert(status === 201 || status === 409, `Expected 201 or 409, got ${status}`);
     if (status === 201) {
       token = data.accessToken;
-      userId = data.user._id;
     }
   });
 
   // Login
   await test('POST /api/auth/login → 200', async () => {
-    const { status, data } = await json('POST', '/api/auth/login', {
+    const { status } = await json('POST', '/api/auth/login', {
       body: { email: `smoke_${Date.now()}@test.com`, password: 'SmokePass123!' },
     });
-    // Either succeeds or fails with invalid credentials
     assert(status === 200 || status === 401, `Expected 200 or 401, got ${status}`);
   });
 
@@ -94,10 +91,10 @@ async function run() {
     assert(status === 401, `Expected 401, got ${status}`);
   });
 
-  // Rate limiting check — rapid requests shouldn't crash
+  // Rate limiting check — rapid requests shouldn't crash the server (429 is fine)
   await test('Rapid requests do not crash server', async () => {
     const results = await Promise.all(
-      Array.from({ length: 5 }).map(() => json('GET', '/api/health')),
+      Array.from({ length: 5 }).map(() => json('GET', '/health')),
     );
     const allOk = results.every((r) => r.status === 200 || r.status === 429);
     assert(allOk, 'Server crashed on rapid requests');

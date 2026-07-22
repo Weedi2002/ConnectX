@@ -55,38 +55,28 @@ function ChatWindow() {
   const handleSmartReply = async () => {
     if (!activeChatId || aiBusy) return;
     setAiBusy(true);
-    try { const { data } = await aiApi.smartReply(activeChatId); setSuggestions(data.suggestions || []); if (!data.suggestions?.length) toast('No suggestions right now'); }
-    catch (err) { toast.error(err.response?.data?.error || 'AI unavailable'); }
-    finally { setAiBusy(false); }
-  };
-
-  const handleSummarize = async () => {
-    if (!activeChatId || aiBusy) return;
-    setAiBusy(true);
-    try { const { data } = await aiApi.summarize(activeChatId); setSummary(data.summary || 'No summary available.'); }
+    try { const { data } = await aiApi.smartReply(activeChatId); setSuggestions(data.suggestions || []); if (!data.suggestions?.length) toast('No suggestions'); }
     catch (err) { toast.error(err.response?.data?.error || 'AI unavailable'); }
     finally { setAiBusy(false); }
   };
 
   const toggleSetting = async (key) => {
     try { const { data } = await chatSettingsApi.update(activeChatId, key, !settings[key]); dispatch(updateChatSettings({ chatId: activeChatId, settings: data.settings })); }
-    catch { toast.error('Failed to update'); }
+    catch { toast.error('Failed'); }
   };
 
   useEffect(() => {
     const socket = getSocket();
-    const refreshPinned = () => { if (!activeChatId) return; api.get(`/messages/${activeChatId}/pinned`).then((r) => setPinned(r.data.messages)); };
-    socket?.on('message:updated', refreshPinned);
-    return () => socket?.off('message:updated', refreshPinned);
+    const refresh = () => { if (!activeChatId) return; api.get(`/messages/${activeChatId}/pinned`).then((r) => setPinned(r.data.messages)); };
+    socket?.on('message:updated', refresh);
+    return () => socket?.off('message:updated', refresh);
   }, [activeChatId]);
 
   if (!activeChatId || !chat) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl glass-card text-4xl">
-            💬
-          </div>
+          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl glass-card text-4xl">💬</div>
           <p className="text-base font-medium text-slate-200">Select a chat</p>
           <p className="text-sm text-slate-400 mt-1">Pick a conversation to start messaging</p>
         </div>
@@ -102,8 +92,8 @@ function ChatWindow() {
   return (
     <div className="relative flex h-full flex-col min-w-0">
       {/* Header */}
-      <header className="glass flex items-center gap-3 px-4 py-3 border-b border-white/[0.08]">
-        <button onClick={() => dispatch(setActiveChat(null))} className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors md:hidden">←</button>
+      <header className="flex items-center gap-3 px-5 py-3 border-b border-white/[0.08]">
+        <button onClick={() => dispatch(setActiveChat(null))} className="rounded-lg p-1.5 text-slate-400 hover:bg-white/[0.08] md:hidden">←</button>
         <button onClick={() => isGroup && setShowInfo((v) => !v)} className="flex min-w-0 items-center gap-3 text-left">
           <Avatar user={headerAvatar} size={40} showPresence={!isGroup} />
           <div className="min-w-0">
@@ -112,34 +102,32 @@ function ChatWindow() {
           </div>
         </button>
         <div className="ml-auto flex items-center gap-1">
-          <button className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors" title="Voice call">📞</button>
-          <button className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors" title="Video call">📹</button>
-          {isGroup && <button onClick={() => setShowInfo((v) => !v)} className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors" title="Group info">ⓘ</button>}
-          <button onClick={() => toggleSetting('pinned')} className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors" title="Pin chat">{settings.pinned ? '📌' : '📍'}</button>
-          <button onClick={() => toggleSetting('favorite')} className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors" title="Favorite">{settings.favorite ? '⭐' : '☆'}</button>
-          <button onClick={handleSmartReply} disabled={aiBusy} className="rounded-xl p-2 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors disabled:opacity-50" title="AI smart replies">{aiBusy ? '⏳' : '✨'}</button>
+          <button className="rounded-lg p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200" title="Voice call">📞</button>
+          <button className="rounded-lg p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200" title="Video call">📹</button>
+          {isGroup && <button onClick={() => setShowInfo((v) => !v)} className="rounded-lg p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200">ⓘ</button>}
+          <button onClick={() => toggleSetting('pinned')} className="rounded-lg p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200">{settings.pinned ? '📌' : '📍'}</button>
+          <button onClick={() => toggleSetting('favorite')} className="rounded-lg p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200">{settings.favorite ? '⭐' : '☆'}</button>
+          <button onClick={handleSmartReply} disabled={aiBusy} className="rounded-lg p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 disabled:opacity-50">{aiBusy ? '⏳' : '✨'}</button>
         </div>
       </header>
 
       {/* Messages */}
-      <MessageList chatId={activeChatId} isGroup={isGroup} onForward={handleForward} />
+      <div className="flex-1 min-h-0">
+        <MessageList chatId={activeChatId} isGroup={isGroup} onForward={handleForward} />
+      </div>
 
-      {/* Pinned bar */}
+      {/* Pinned */}
       {pinned.length > 0 && (
-        <div className="glass-light flex items-center gap-2 mx-3 mb-2 rounded-xl px-4 py-2 text-xs text-slate-300">
-          <span className="text-sm">📌</span>
-          <span className="truncate">
-            <span className="font-semibold">{pinned[0].sender?.username}: </span>
-            {pinned[0].content || '📎 attachment'}
-          </span>
-          {pinned.length > 1 && <span className="ml-auto whitespace-nowrap text-slate-500">+{pinned.length - 1} more</span>}
+        <div className="glass flex items-center gap-2 mx-2 mb-1 rounded-lg px-3 py-1.5 text-[11px] text-slate-300">
+          <span>📌</span>
+          <span className="truncate"><span className="font-semibold">{pinned[0].sender?.username}: </span>{pinned[0].content || '📎'}</span>
+          {pinned.length > 1 && <span className="ml-auto text-slate-500">+{pinned.length - 1}</span>}
         </div>
       )}
 
       {/* Input */}
-      <MessageInput chatId={activeChatId} suggestions={suggestions} onUseSuggestion={() => setSuggestions([])} onSummarize={handleSummarize} aiBusy={aiBusy} />
+      <MessageInput chatId={activeChatId} suggestions={suggestions} onUseSuggestion={() => setSuggestions([])} />
 
-      {/* Group info panel */}
       {isGroup && showInfo && (
         <div className="absolute inset-0 z-20 md:static md:inset-auto">
           <GroupInfoPanel chat={chat} onClose={() => setShowInfo(false)} />
@@ -150,10 +138,10 @@ function ChatWindow() {
 
       {summary !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm" onClick={() => setSummary(null)}>
-          <div className="glass max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-3xl p-6 shadow-glass" onClick={(e) => e.stopPropagation()}>
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-lg font-semibold text-slate-100">✨ Conversation summary</p>
-              <button onClick={() => setSummary(null)} className="rounded-lg p-1 text-slate-400 hover:bg-white/[0.08] hover:text-red-400">×</button>
+          <div className="glass max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl p-5 shadow-glass" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-lg font-semibold text-slate-100">✨ Summary</p>
+              <button onClick={() => setSummary(null)} className="text-slate-400 hover:text-red-400">×</button>
             </div>
             <div className="whitespace-pre-wrap text-sm text-slate-200 leading-relaxed">{summary}</div>
           </div>

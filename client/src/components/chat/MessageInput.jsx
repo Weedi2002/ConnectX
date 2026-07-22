@@ -7,7 +7,7 @@ import { addMessage, setReplyTo } from '../../redux/chatSlice.js';
 import { getSocket } from '../../services/socket.js';
 import { formatBytes, formatDuration } from '../../utils/format.js';
 
-function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, aiBusy }) {
+function MessageInput({ chatId, suggestions = [], onUseSuggestion }) {
   const dispatch = useDispatch();
   const replyTo = useSelector((s) => s.chat.replyToByChat[chatId]);
   const [text, setText] = useState('');
@@ -45,7 +45,7 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
       dispatch(setReplyTo({ chatId, message: null }));
       getSocket()?.emit('typing:stop', { chatId });
       typingRef.current = false;
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed to send'); }
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
     finally { setSending(false); }
   };
 
@@ -71,14 +71,14 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
       recorder.start();
       setRecording(true); setRecordingTime(0);
       timerRef.current = setInterval(() => setRecordingTime((t) => t + 1), 1000);
-    } catch { toast.error('Microphone access denied'); setRecording(false); }
+    } catch { toast.error('Microphone denied'); setRecording(false); }
   };
 
   const stopRecording = () => { mediaRecorderRef.current?.stop(); };
   const cancelRecording = () => { cancelledRef.current = true; stopRecording(); };
 
   const uploadVoice = async (blob) => {
-    if (blob.size < 1000) { toast.error('Recording too short'); return; }
+    if (blob.size < 1000) { toast.error('Too short'); return; }
     setSending(true);
     try {
       const ext = blob.type.includes('mp4') ? 'm4a' : 'webm';
@@ -86,20 +86,19 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
       const form = new FormData(); form.append('files', file);
       const { data } = await api.post('/upload', form, { headers: { 'Content-Type': 'multipart/form-data' } });
       const att = data.attachments[0];
-      const attachment = { url: att.url, publicId: att.publicId, type: 'audio', name: att.name, size: att.size, mime: att.mime };
-      const { data: msg } = await api.post('/messages', { chatId, content: '', attachments: [attachment] });
+      const { data: msg } = await api.post('/messages', { chatId, content: '', attachments: [{ url: att.url, publicId: att.publicId, type: 'audio', name: att.name, size: att.size, mime: att.mime }] });
       dispatch(addMessage(msg.message));
-    } catch (err) { toast.error(err.response?.data?.error || 'Failed to send voice message'); }
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
     finally { setSending(false); }
   };
 
   return (
-    <div className="glass border-t border-white/[0.08] px-4 py-3">
+    <div className="glass-input-bar border-t border-white/[0.06] px-4 py-3">
       {replyTo && (
-        <div className="glass-card mb-2 flex items-center gap-2 !rounded-xl border-l-2 border-cyan-400 px-3 py-2">
+        <div className="mb-2.5 flex items-center gap-2 rounded-xl border-l-2 border-cyan-400 bg-white/[0.06] px-3 py-2">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-cyan-300">{replyTo.sender?.username || 'User'}</p>
-            <p className="truncate text-xs text-slate-300">{replyTo.attachments?.length > 0 && !replyTo.content ? `📎 ${replyTo.attachments[0].name}` : replyTo.content}</p>
+            <p className="text-[11px] font-semibold text-cyan-300">{replyTo.sender?.username}</p>
+            <p className="truncate text-[11px] text-slate-300">{replyTo.attachments?.length > 0 && !replyTo.content ? `📎 ${replyTo.attachments[0].name}` : replyTo.content}</p>
           </div>
           <button onClick={() => dispatch(setReplyTo({ chatId, message: null }))} className="text-slate-400 hover:text-red-400">×</button>
         </div>
@@ -108,21 +107,21 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
       {files.length > 0 && (
         <div className="mb-2 flex flex-wrap gap-1.5">
           {files.map((f, i) => (
-            <span key={i} className="glass-card flex items-center gap-1.5 !rounded-full px-3 py-1 text-xs">
+            <span key={i} className="flex items-center gap-1 rounded-full bg-white/[0.08] px-2.5 py-1 text-[10px]">
               📎 {f.name} ({formatBytes(f.size)})
-              <button onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))} className="ml-0.5 text-slate-400 hover:text-red-400">×</button>
+              <button onClick={() => setFiles((p) => p.filter((_, idx) => idx !== i))} className="text-slate-400 hover:text-red-400">×</button>
             </span>
           ))}
         </div>
       )}
 
       {recording && (
-        <div className="glass-card mb-2 flex items-center gap-2 !rounded-xl px-4 py-2.5 text-sm">
-          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-red-500" />
+        <div className="mb-2.5 flex items-center gap-2 rounded-xl bg-red-500/10 border border-red-500/20 px-3 py-2 text-[12px]">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
           <span className="text-slate-300">Recording… {formatDuration(recordingTime)}</span>
-          <span className="ml-auto flex gap-2">
-            <button onClick={cancelRecording} className="glass-card !rounded-lg px-3 py-1 text-xs text-red-300">✕ Cancel</button>
-            <button onPointerDown={stopRecording} className="glass-btn-primary px-3 py-1 text-xs">⏹ Send</button>
+          <span className="ml-auto flex gap-1.5">
+            <button onClick={cancelRecording} className="rounded-lg px-2.5 py-1 text-[10px] text-red-300 hover:bg-white/[0.06]">✕</button>
+            <button onPointerDown={stopRecording} className="glass-btn-primary px-2.5 py-1 text-[10px]">⏹</button>
           </span>
         </div>
       )}
@@ -130,26 +129,35 @@ function MessageInput({ chatId, suggestions = [], onUseSuggestion, onSummarize, 
       {suggestions.length > 0 && (
         <div className="mb-2 flex flex-wrap gap-1.5">
           {suggestions.map((s, i) => (
-            <button key={i} type="button" onClick={() => { setText((t) => (t ? `${t} ${s}` : s)); onUseSuggestion?.(s); }} className="glass-card !rounded-full border-cyan-500/20 px-3 py-1 text-xs text-cyan-200 hover:bg-cyan-500/10">{s}</button>
+            <button key={i} type="button" onClick={() => { setText((t) => (t ? `${t} ${s}` : s)); onUseSuggestion?.(s); }} className="rounded-full bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-0.5 text-[10px] text-cyan-200 hover:bg-cyan-500/20">{s}</button>
           ))}
         </div>
       )}
 
       <form onSubmit={handleSend} className="flex items-center gap-2">
-        <button type="button" onClick={() => fileInput.current?.click()} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors" title="Attach files">📎</button>
-        <input ref={fileInput} type="file" multiple hidden onChange={(e) => setFiles((prev) => [...prev, ...Array.from(e.target.files)].slice(0, 5))} />
-        <button type="button" onClick={() => setPicker((p) => !p)} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors" title="Emoji">😊</button>
-        <input value={text} onChange={(e) => { setText(e.target.value); emitTyping(); }} placeholder="Type your message here..." className="glass-input flex-1 px-4 py-2.5 text-sm" />
-        <button type="button" onClick={onSummarize} disabled={aiBusy} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors disabled:opacity-50" title="AI summarize">✨</button>
+        <button type="button" onClick={() => setPicker((p) => !p)} className="flex-shrink-0 rounded-full p-2 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors" title="Emoji">
+          😊
+        </button>
+        <input ref={fileInput} type="file" multiple hidden onChange={(e) => setFiles((p) => [...p, ...Array.from(e.target.files)].slice(0, 5))} />
+        <input
+          value={text}
+          onChange={(e) => { setText(e.target.value); emitTyping(); }}
+          placeholder="Type your message here..."
+          className="message-input flex-1 rounded-full px-4 py-2.5 text-[12px]"
+        />
+        <button type="button" onClick={() => fileInput.current?.click()} className="flex-shrink-0 rounded-full p-2 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors" title="Attach">
+          📎
+        </button>
         {recording ? (
-          <span className="glass-card flex-shrink-0 !rounded-full bg-red-500/20 px-4 py-2.5 text-sm text-red-300">● Rec</span>
+          <span className="flex-shrink-0 rounded-full bg-red-500/20 px-3 py-2 text-[11px] text-red-300">●</span>
         ) : (
-          <button type="button" onPointerDown={startRecording} disabled={sending} className="flex-shrink-0 rounded-xl p-2.5 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 transition-colors disabled:opacity-50" title="Hold to record voice message">🎤</button>
+          <button type="button" onPointerDown={startRecording} disabled={sending} className="flex-shrink-0 rounded-full p-2 text-slate-400 hover:bg-white/[0.08] hover:text-slate-200 disabled:opacity-50 transition-colors" title="Record">
+            🎤
+          </button>
         )}
-        <button type="submit" disabled={sending || (!text.trim() && files.length === 0)} className="glass-btn-primary flex-shrink-0 px-5 py-2.5 text-sm">➤</button>
       </form>
 
-      {picker && <div className="absolute bottom-20 left-3 z-30"><EmojiPicker onEmojiClick={(e) => { setText((t) => t + e.emoji); setPicker(false); }} width={280} height={320} previewConfig={{ showPreview: false }} /></div>}
+      {picker && <div className="absolute bottom-16 left-4 z-30"><EmojiPicker onEmojiClick={(e) => { setText((t) => t + e.emoji); setPicker(false); }} width={260} height={300} previewConfig={{ showPreview: false }} /></div>}
     </div>
   );
 }

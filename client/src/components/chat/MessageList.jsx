@@ -49,7 +49,7 @@ function MessageList({ chatId, isGroup, onForward }) {
     <div
       ref={containerRef}
       onScroll={onScroll}
-      className="flex-1 space-y-2 overflow-y-auto px-4 py-4"
+      className="flex-1 overflow-y-auto px-4 py-4"
     >
       {hasMore && <p className="text-center text-xs text-slate-500">Scroll up to load more...</p>}
       {messages.map((msg) => (

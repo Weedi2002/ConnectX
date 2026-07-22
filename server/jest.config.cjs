@@ -6,6 +6,7 @@ module.exports = {
   },
   moduleFileExtensions: ['js', 'json'],
   testMatch: ['**/__tests__/**/*.test.js', '**/*.test.js'],
+  testPathIgnorePatterns: ['/node_modules/', '__tests__/e2e/'],
   collectCoverageFrom: [
     'src/**/*.js',
     '!src/server.js',

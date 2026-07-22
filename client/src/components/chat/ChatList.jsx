@@ -26,18 +26,12 @@ function ChatList({ type } = {}) {
   if (loadingChats) return <ChatListSkeleton />;
 
   if (sorted.length === 0) {
-    if (type === 'groups') {
-      return (
-        <div className="flex flex-col items-center py-6 text-center">
-          <p className="text-xs text-slate-500">No groups yet</p>
-        </div>
-      );
-    }
+    if (type === 'groups') return <p className="px-1 py-2 text-center text-[10px] text-slate-500">No groups yet</p>;
     return null;
   }
 
   return (
-    <ul className="space-y-1">
+    <ul className="space-y-0.5">
       {sorted.map((chat) => {
         const peer = otherMember(chat, userId);
         const last = chat.lastMessage;
@@ -50,32 +44,22 @@ function ChatList({ type } = {}) {
             <button
               onClick={() => dispatch(setActiveChat(chat._id))}
               className={cn(
-                'flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left transition-all',
-                isActive
-                  ? 'bg-white/[0.1] border border-white/[0.08]'
-                  : 'hover:bg-white/[0.05]',
+                'flex w-full items-center gap-2 rounded-xl px-2 py-1.5 text-left transition-all',
+                isActive ? 'bg-white/[0.1]' : 'hover:bg-white/[0.05]',
               )}
             >
-              <div className="relative flex-shrink-0">
-                <Avatar user={peer} size={38} showPresence={!chat.isGroup} />
-              </div>
+              <Avatar user={peer} size={34} showPresence={!chat.isGroup} />
               <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-1.5">
-                  <p className="truncate text-[13px] font-medium text-slate-100">
-                    {peer.username}
-                  </p>
-                  {timeStr && (
-                    <span className="flex-shrink-0 text-[10px] text-slate-500">{timeStr}</span>
-                  )}
+                <div className="flex items-center justify-between gap-1">
+                  <p className="truncate text-[11px] font-medium text-slate-100">{peer.username}</p>
+                  {timeStr && <span className="flex-shrink-0 text-[8px] text-slate-500">{timeStr}</span>}
                 </div>
-                <div className="flex items-center justify-between gap-1.5 mt-0.5">
-                  <p className="truncate text-[11px] text-slate-400">
-                    {last?.attachments?.length
-                      ? '📎 Attachment'
-                      : last?.content || 'No messages yet'}
+                <div className="flex items-center justify-between gap-1 mt-0.5">
+                  <p className="truncate text-[9px] text-slate-400">
+                    {last?.attachments?.length ? '📎' : last?.content || 'No messages'}
                   </p>
                   {unread > 0 && (
-                    <span className="flex h-4 min-w-4 flex-shrink-0 items-center justify-center rounded-full bg-cyan-500 px-1 text-[9px] font-bold text-white">
+                    <span className="flex h-3.5 min-w-3.5 flex-shrink-0 items-center justify-center rounded-full bg-cyan-500 px-1 text-[7px] font-bold text-white">
                       {unread > 99 ? '99+' : unread}
                     </span>
                   )}
