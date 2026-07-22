@@ -9,7 +9,8 @@
     "start": "node src/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "jest --config jest.config.cjs --forceExit --detectOpenHandles"
+    "test": "jest --config jest.config.cjs --forceExit --detectOpenHandles",
+    "test:e2e": "node __tests__/e2e/smoke.test.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

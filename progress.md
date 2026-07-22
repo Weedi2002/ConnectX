@@ -163,8 +163,8 @@
 ## Testing
 - [x] Backend unit tests (Jest) — 44 tests, 7 suites, all passing
 - [x] Backend integration tests (Supertest) — auth, chat, message, friend endpoints
-- [ ] Frontend tests (Vitest + RTL)
-- [ ] E2E smoke tests
+- [x] Frontend tests (Vitest + RTL) — 21 tests, 6 suites, all passing
+- [x] E2E smoke tests — lightweight fetch-based smoke suite (run against dev server)
 
 ---
 
