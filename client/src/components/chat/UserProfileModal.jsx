@@ -4,14 +4,16 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { usersApi } from '../../services/api.js';
 import { sendRequest, blockUser } from '../../redux/friendSlice.js';
+import { openChat } from '../../redux/chatSlice.js';
 import Avatar from '../Avatar.jsx';
 import { formatLastSeen } from '../../utils/format.js';
 
 function relStatus(lists, userId) {
   const id = String(userId);
+  if (lists.friends.some((u) => String(u._id) === id)) return 'friend';
+  if (lists.blocked.some((u) => String(u._id) === id)) return 'blocked';
   if (lists.sent.some((r) => String(r.recipient?._id) === id)) return 'sent';
   if (lists.incoming.some((r) => String(r.sender?._id) === id)) return 'incoming';
-  if (lists.blocked.some((u) => String(u._id) === id)) return 'blocked';
   return 'none';
 }
 
@@ -77,6 +79,19 @@ export default function UserProfileModal({ userId, onClose }) {
     }
   };
 
+  const handleOpenChat = async () => {
+    try {
+      const result = await dispatch(openChat(user._id));
+      if (openChat.fulfilled.match(result)) {
+        onClose();
+      } else {
+        toast.error('Could not open chat');
+      }
+    } catch {
+      toast.error('Could not open chat');
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
@@ -130,6 +145,13 @@ export default function UserProfileModal({ userId, onClose }) {
             <p className="glass-card w-full !rounded-xl py-2.5 text-center text-sm text-slate-400">
               Blocked
             </p>
+          )}
+          {status === 'friend' && (
+            <>
+              <button onClick={handleOpenChat} className="glass-btn-primary w-full py-2.5 text-sm">
+                💬 Message
+              </button>
+            </>
           )}
         </div>
 

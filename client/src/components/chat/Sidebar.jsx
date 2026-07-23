@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import Avatar from '../Avatar.jsx';
 import ChatList from './ChatList.jsx';
+import FriendsList from './FriendsList.jsx';
 import CreateGroupModal from './CreateGroupModal.jsx';
 import SearchModal from './SearchModal.jsx';
 import FriendRequestsPanel from './FriendRequestsPanel.jsx';
@@ -115,17 +116,9 @@ function ContentPanel({ activeNav }) {
           <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-4">
             {/* Groups */}
             <div className="glass-card p-3">
-              <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                Groups
-              </p>
-              <ChatList type="groups" />
-            </div>
-
-            {/* Person */}
-            <div className="glass-card p-3">
               <div className="flex items-center justify-between px-2 pb-2">
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                  Person
+                  Groups
                 </p>
                 <button
                   onClick={() => setCreatingGroup(true)}
@@ -134,7 +127,15 @@ function ContentPanel({ activeNav }) {
                   + New Group
                 </button>
               </div>
-              <ChatList type="persons" />
+              <ChatList type="groups" />
+            </div>
+
+            {/* Person */}
+            <div className="glass-card p-3">
+              <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Person
+              </p>
+              <FriendsList />
             </div>
           </div>
         </>
