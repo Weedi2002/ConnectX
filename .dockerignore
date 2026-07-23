@@ -1,0 +1,12 @@
+node_modules
+client
+.git
+.github
+*.md
+.env
+.env.local
+.dockerignore
+docker-compose.yml
+__tests__
+coverage
+.nyc_output
